@@ -1,0 +1,35 @@
+<view class="page-container">
+  <view class="about-header">
+    <view class="logo-wrap">
+      <text class="logo-text">MISCHA</text>
+    </view>
+    <view class="name">{{aboutInfo.name}}</view>
+    <view class="slogan">{{aboutInfo.slogan}}</view>
+  </view>
+
+  <view class="about-section">
+    <view class="section-header">
+      <text class="section-subtitle">ABOUT US</text>
+      <text class="section-title">公司简介</text>
+    </view>
+    <view class="section-content">{{aboutInfo.description}}</view>
+  </view>
+
+  <view class="about-section">
+    <view class="section-header">
+      <text class="section-subtitle">ADVANTAGES</text>
+      <text class="section-title">我们的优势</text>
+    </view>
+    <view class="feature-list">
+      <view class="feature-item" wx:for="{{aboutInfo.features}}" wx:key="index">
+        <view class="feature-icon">✦</view>
+        <view class="feature-text">{{item}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="about-footer">
+    <text class="footer-brand">MISCHA WEDDING</text>
+    <text class="footer-copyright">© 2024 米夏婚礼 All Rights Reserved</text>
+  </view>
+</view>

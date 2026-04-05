@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "在线预约",
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "float-service": "/components/float-service/index"
+  }
+}

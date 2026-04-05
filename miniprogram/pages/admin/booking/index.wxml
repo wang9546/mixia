@@ -1,0 +1,77 @@
+<view class="page-container">
+  <view class="stats-section">
+    <view class="stats-item">
+      <text class="stats-value">{{stats.pending}}</text>
+      <text class="stats-label">待处理</text>
+    </view>
+    <view class="stats-item">
+      <text class="stats-value">{{stats.confirmed}}</text>
+      <text class="stats-label">已确认</text>
+    </view>
+    <view class="stats-item">
+      <text class="stats-value">{{stats.completed}}</text>
+      <text class="stats-label">已完成</text>
+    </view>
+    <view class="stats-item">
+      <text class="stats-value">{{stats.cancelled}}</text>
+      <text class="stats-label">已取消</text>
+    </view>
+  </view>
+
+  <view class="filter-section">
+    <scroll-view class="status-scroll" scroll-x="{{true}}" enhanced="{{true}}" show-scrollbar="{{false}}">
+      <view class="status-list">
+        <view 
+          class="status-item {{status === item.value ? 'active' : ''}}" 
+          wx:for="{{statusList}}" 
+          wx:key="value"
+          bindtap="onStatusChange"
+          data-value="{{item.value}}"
+        >
+          {{item.label}}
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="booking-section" wx:if="{{!loading}}">
+    <view class="booking-item" wx:for="{{bookings}}" wx:key="_id" bindtap="onBookingTap" data-id="{{item._id}}">
+      <view class="booking-header">
+        <text class="booking-name">{{item.groomName}} & {{item.brideName}}</text>
+        <text class="booking-status {{item.statusClass}}">{{item.statusText}}</text>
+      </view>
+      <view class="booking-info">
+        <view class="info-row">
+          <text class="info-label">预约编号：</text>
+          <text class="info-value">{{item.orderNo}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">联系电话：</text>
+          <text class="info-value">{{item.phone}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">预约日期：</text>
+          <text class="info-value">{{item.bookingDate}}</text>
+        </view>
+        <view class="info-row" wx:if="{{item.remark}}">
+          <text class="info-label">备注：</text>
+          <text class="info-value">{{item.remark}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:if="{{bookings.length === 0}}">
+      <text class="empty-icon">📋</text>
+      <text class="empty-text">暂无预约记录</text>
+    </view>
+  </view>
+
+  <view class="loading-container" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <view class="fab-btn" bindtap="onCreateTap">
+    <text class="fab-icon">+</text>
+  </view>
+</view>

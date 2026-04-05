@@ -1,0 +1,22 @@
+<view class="page-container">
+  <view class="admin-header">
+    <text class="admin-title">管理后台</text>
+    <text class="admin-subtitle">ADMIN CONSOLE</text>
+  </view>
+
+  <view class="menu-section">
+    <view 
+      class="menu-item" 
+      wx:for="{{menuList}}" 
+      wx:key="id"
+      bindtap="onMenuTap"
+      data-url="{{item.url}}"
+    >
+      <view class="menu-icon">{{item.icon}}</view>
+      <view class="menu-content">
+        <text class="menu-name">{{item.name}}</text>
+      </view>
+      <text class="menu-arrow">→</text>
+    </view>
+  </view>
+</view>

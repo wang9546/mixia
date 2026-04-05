@@ -1,29 +1,81 @@
-<!--index.wxml-->
-<view class="container">
-  <view class="title">快速了解云开发</view>
-  <view class="top_tip">免鉴权接口调用 免部署后台 高并发</view>
-  <view class="power" wx:key="title" wx:for="{{powerList}}" wx:for-item="power">
-    <view class="power_info" data-index="{{index}}" data-type="{{ power.type }}" bindtap="onClickPowerInfo">
-      <view class="power_info_text">
-        <view class="power_info_text_title">
-          {{power.title}}
-          <view class="power_info_text_tag" wx:if="{{power.tag}}">{{power.tag}}</view>
+<view class="page-container">
+  <view class="banner-wrap">
+    <swiper 
+      class="banner-swiper" 
+      indicator-dots="{{banners.length > 1}}" 
+      autoplay="{{true}}" 
+      interval="5000" 
+      circular="{{true}}"
+      indicator-color="rgba(255,255,255,0.3)"
+      indicator-active-color="#ffffff"
+    >
+      <swiper-item wx:for="{{banners}}" wx:key="_id" bindtap="onBannerTap" data-item="{{item}}">
+        <image class="banner-image" src="{{item.imageUrl || item.image}}" mode="aspectFill"></image>
+        <view class="banner-overlay"></view>
+      </swiper-item>
+      <swiper-item wx:if="{{banners.length === 0}}">
+        <view class="banner-placeholder">
+          <view class="placeholder-content">
+            <text class="placeholder-brand">MISCHA</text>
+            <text class="placeholder-slogan">WEDDING & EVENT</text>
+          </view>
         </view>
-        <view class="power_info_text_tip">{{power.tip}}</view>
-      </view>
-      <image wx:if="{{!power.showItem && power.item.length}}" class="power_info_more" src="../../images/arrow.svg"></image>
-      <image wx:if="{{power.showItem && power.item.length}}" class="power_info_less" src="../../images/arrow.svg"></image>
-      <image wx:if="{{!power.item.length}}" class="power_item_icon" src="../../images/arrow.svg"></image>
+      </swiper-item>
+    </swiper>
+  </view>
+
+  <view class="services-section">
+    <view class="section-header">
+      <text class="sh-title">OUR SERVICES</text>
+      <text class="sh-subtitle">核心服务</text>
     </view>
-    <view wx:if="{{power.showItem}}">
-      <view wx:key="title" wx:for="{{power.item}}">
-        <view class="line"></view>
-        <view class="power_item" bindtap="jumpPage" data-type="{{ item.type }}" data-page="{{item.page}}">
-          <view class="power_item_title">{{item.title}}</view>
-          <image class="power_item_icon" src="../../images/arrow.svg"></image>
+    
+    <view class="service-grid">
+      <view class="service-card" wx:for="{{serviceCategories}}" wx:key="id" bindtap="onCategoryTap" data-id="{{item.id}}">
+        <view class="sc-top">
+          <text class="sc-number">0{{index + 1}}</text>
+          <text class="sc-arrow">→</text>
+        </view>
+        <view class="sc-bottom">
+          <text class="sc-en">{{item.en}}</text>
+          <text class="sc-name">{{item.name}}</text>
         </view>
       </view>
     </view>
   </view>
-  <cloud-tip-modal showTipProps="{{showTip}}" title="{{title}}" content="{{content}}"></cloud-tip-modal>
+
+  <view class="features-section">
+    <view class="feature-item">
+      <view class="fi-icon">I.</view>
+      <view class="fi-content">
+        <text class="fi-title">高定团队</text>
+        <text class="fi-desc">懂审美的策划师与设计师，把控每处花艺与光影的极致呈现</text>
+      </view>
+    </view>
+    <view class="feature-item">
+      <view class="fi-icon">II.</view>
+      <view class="fi-content">
+        <text class="fi-title">私人定制</text>
+        <text class="fi-desc">拒绝模板流水线，倾听你们的相遇故事，量身定制专属视觉</text>
+      </view>
+    </view>
+    <view class="feature-item">
+      <view class="fi-icon">III.</view>
+      <view class="fi-content">
+        <text class="fi-title">细节控</text>
+        <text class="fi-desc">从请柬纸张的触感到宾客桌卡的摆放，让您享受备婚的从容</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="cta-section">
+    <view class="cta-box">
+      <text class="cta-en">START YOUR JOURNEY</text>
+      <text class="cta-title">开启浪漫之旅</text>
+      <view class="cta-line"></view>
+      <button class="cta-btn" bindtap="onBookingTap">预约专属顾问</button>
+    </view>
+  </view>
+
+  <float-service />
 </view>

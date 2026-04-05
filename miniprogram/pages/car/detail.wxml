@@ -1,0 +1,119 @@
+<view class="page-container" wx:if="{{!loading && info}}">
+  <view class="media-section">
+    <image 
+      wx:if="{{info.coverImageUrl || info.coverImage}}"
+      class="main-image" 
+      src="{{info.coverImageUrl || info.coverImage}}" 
+      mode="aspectFill"
+      bindtap="onImageTap"
+      data-index="0"
+    ></image>
+    
+    <swiper 
+      wx:elif="{{info.images && info.images.length > 0}}"
+      class="image-swiper" 
+      indicator-dots="{{info.images.length > 1}}"
+      indicator-color="rgba(255,255,255,0.4)"
+      indicator-active-color="#C9A96E"
+      circular="{{true}}"
+    >
+      <swiper-item wx:for="{{info.images}}" wx:key="index">
+        <image 
+          class="main-image" 
+          src="{{item}}" 
+          mode="aspectFill"
+          bindtap="onImageTap"
+          data-index="{{index}}"
+        ></image>
+      </swiper-item>
+    </swiper>
+  </view>
+
+  <view class="info-section">
+    <view class="info-header">
+      <view class="info-title">{{info.title}}</view>
+      <view class="info-tags">
+        <text class="tag tag-gold" wx:if="{{info.brandName}}">{{info.brandName}}</text>
+        <text class="tag tag-outline" wx:if="{{info.colorName}}">{{info.colorName}}</text>
+      </view>
+    </view>
+
+    <view class="price-row" wx:if="{{info.price}}">
+      <text class="price-label">参考价格</text>
+      <view class="price-value">
+        <text class="price-symbol">¥</text>
+        <text class="price-num">{{info.price}}</text>
+        <text class="price-unit">/辆</text>
+      </view>
+    </view>
+
+    <view class="info-stats">
+      <view class="stat-item">
+        <text class="stat-value">{{info.viewCount || 0}}</text>
+        <text class="stat-label">浏览</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-value">{{info.collectCount || 0}}</text>
+        <text class="stat-label">收藏</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="detail-section" wx:if="{{info.description}}">
+    <view class="section-header">
+      <text class="section-subtitle">DESCRIPTION</text>
+      <text class="section-title">车辆介绍</text>
+    </view>
+    <view class="desc-content">{{info.description}}</view>
+  </view>
+
+  <view class="detail-section" wx:if="{{info.features && info.features.length > 0}}">
+    <view class="section-header">
+      <text class="section-subtitle">FEATURES</text>
+      <text class="section-title">服务特色</text>
+    </view>
+    <view class="feature-list">
+      <view class="feature-item" wx:for="{{info.features}}" wx:key="index">
+        <text class="feature-dot">◈</text>
+        <text class="feature-text">{{item}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="detail-section" wx:if="{{info.images && info.images.length > 0}}">
+    <view class="section-header">
+      <text class="section-subtitle">GALLERY</text>
+      <text class="section-title">车辆图片</text>
+    </view>
+    <view class="gallery-grid">
+      <view 
+        class="gallery-item" 
+        wx:for="{{info.images}}" 
+        wx:key="index"
+        bindtap="onImageTap"
+        data-index="{{index}}"
+      >
+        <image class="gallery-image" src="{{item}}" mode="aspectFill"></image>
+        <view class="gallery-overlay">
+          <text class="gallery-index">{{index + 1}}/{{info.images.length}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="bottom-bar safe-area-bottom">
+    <button class="booking-btn btn-primary" bindtap="onBookingTap">
+      立即咨询
+    </button>
+  </view>
+</view>
+
+<view class="loading-container" wx:if="{{loading}}">
+  <view class="loading-content">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+</view>
+
+<float-service />

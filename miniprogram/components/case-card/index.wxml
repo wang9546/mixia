@@ -1,0 +1,16 @@
+<view class="case-card" bindtap="onTap">
+  <view class="case-cover-wrap">
+    <image class="case-cover" src="{{coverImage}}" mode="aspectFill"></image>
+    <view class="case-cover-overlay"></view>
+  </view>
+  <view class="case-info">
+    <view class="case-title">{{title}}</view>
+    <view class="case-meta">
+      <text class="case-type">{{serviceType === 'wedding_car' ? '婚车服务' : serviceType === 'dress' ? '婚纱礼服' : serviceType === 'photography' ? '婚礼摄影' : '一站式套餐'}}</text>
+      <view class="case-stats">
+        <text class="stat-icon">👁</text>
+        <text class="stat-num">{{viewCount}}</text>
+      </view>
+    </view>
+  </view>
+</view>

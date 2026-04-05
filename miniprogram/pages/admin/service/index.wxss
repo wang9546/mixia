@@ -1,0 +1,77 @@
+.page-container {
+  padding: 20rpx;
+  background: #f5f5f5;
+  min-height: 100vh;
+}
+
+.menu-section {
+  background: #fff;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+.menu-group {
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.menu-group:last-child {
+  border-bottom: none;
+}
+
+.menu-header {
+  display: flex;
+  align-items: center;
+  padding: 32rpx 24rpx;
+  background: #fff;
+}
+
+.menu-icon {
+  font-size: 40rpx;
+  margin-right: 20rpx;
+}
+
+.menu-name {
+  flex: 1;
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.menu-arrow {
+  font-size: 24rpx;
+  color: #999;
+  transition: transform 0.3s;
+}
+
+.menu-arrow.expanded {
+  transform: rotate(180deg);
+}
+
+.menu-children {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s;
+  background: #fafafa;
+}
+
+.menu-children.show {
+  max-height: 500rpx;
+}
+
+.menu-child-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28rpx 24rpx 28rpx 84rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.child-name {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.child-arrow {
+  font-size: 24rpx;
+  color: #ccc;
+}

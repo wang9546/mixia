@@ -1,0 +1,398 @@
+<view class="page-container">
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-content">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
+  </view>
+
+  <block wx:if="{{!loading}}">
+    <!-- 基本信息 -->
+    <view class="section">
+      <view class="section-title">基本信息</view>
+      
+      <view class="form-item">
+        <view class="form-label required">门店名称</view>
+        <input 
+          class="form-input" 
+          placeholder="请输入门店名称"
+          value="{{formData.name}}"
+          data-field="name"
+          bindinput="onInputChange" />
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">门店描述</view>
+        <textarea 
+          class="form-textarea" 
+          placeholder="请输入门店描述"
+          value="{{formData.description}}"
+          data-field="description"
+          bindinput="onInputChange"
+          maxlength="200" />
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">营业时间</view>
+        <input 
+          class="form-input" 
+          placeholder="如：周一至周日 9:00-18:00"
+          value="{{formData.businessHours}}"
+          data-field="businessHours"
+          bindinput="onInputChange" />
+      </view>
+    </view>
+
+    <!-- 门店图片 -->
+    <view class="section">
+      <view class="section-title">门店图片</view>
+      <view class="image-grid">
+        <view 
+          class="image-item" 
+          wx:for="{{formData.images}}" 
+          wx:key="index">
+          <image 
+            class="preview-image" 
+            src="{{item}}" 
+            mode="aspectFill"
+            bindtap="onPreviewImage"
+            data-url="{{item}}">
+          </image>
+          <view 
+            class="delete-btn" 
+            bindtap="onDeleteImage"
+            data-index="{{index}}">
+            <text class="delete-icon">x</text>
+          </view>
+        </view>
+        <view 
+          class="image-item add-btn" 
+          wx:if="{{formData.images.length < 9}}"
+          bindtap="onChooseImage">
+          <text class="add-icon">+</text>
+          <text class="add-text">添加图片</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 地址信息 -->
+    <view class="section">
+      <view class="section-title">地址信息</view>
+      
+      <view class="form-item" bindtap="onChooseLocation">
+        <view class="form-label">选择位置</view>
+        <view class="form-input-wrap">
+          <text class="form-input {{formData.address ? '' : 'placeholder'}}">
+            {{formData.address || '点击选择门店位置'}}
+          </text>
+          <text class="arrow">></text>
+        </view>
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">省份</view>
+        <input 
+          class="form-input" 
+          placeholder="如：浙江省"
+          value="{{formData.province}}"
+          data-field="province"
+          bindinput="onInputChange" />
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">城市</view>
+        <input 
+          class="form-input" 
+          placeholder="如：杭州市"
+          value="{{formData.city}}"
+          data-field="city"
+          bindinput="onInputChange" />
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">区县</view>
+        <input 
+          class="form-input" 
+          placeholder="如：西湖区"
+          value="{{formData.district}}"
+          data-field="district"
+          bindinput="onInputChange" />
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">详细地址</view>
+        <input 
+          class="form-input" 
+          placeholder="街道门牌号等"
+          value="{{formData.address}}"
+          data-field="address"
+          bindinput="onInputChange" />
+      </view>
+    </view>
+
+    <!-- 联系电话 -->
+    <view class="section">
+      <view class="section-header">
+        <view class="section-title">联系电话</view>
+        <view class="add-btn-text" bindtap="onAddPhone">+ 添加电话</view>
+      </view>
+      
+      <view class="contact-list" wx:if="{{formData.phones.length > 0}}">
+        <view 
+          class="contact-item" 
+          wx:for="{{formData.phones}}" 
+          wx:key="index">
+          <view class="contact-info">
+            <view class="contact-label">{{item.label || '电话'}} {{item.primary ? '(主要)' : ''}}</view>
+            <view class="contact-value">{{item.number}}</view>
+          </view>
+          <view class="contact-actions">
+            <text class="action-text" bindtap="onEditPhone" data-index="{{index}}">编辑</text>
+            <text class="action-text delete" bindtap="onDeletePhone" data-index="{{index}}">删除</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="empty-tip" wx:else>暂无联系电话</view>
+    </view>
+
+    <!-- 微信号 -->
+    <view class="section">
+      <view class="section-header">
+        <view class="section-title">微信号</view>
+        <view class="add-btn-text" bindtap="onAddWechat">+ 添加微信号</view>
+      </view>
+      
+      <view class="contact-list" wx:if="{{formData.wechats.length > 0}}">
+        <view 
+          class="contact-item" 
+          wx:for="{{formData.wechats}}" 
+          wx:key="index">
+          <view class="contact-info">
+            <view class="contact-label">{{item.label || '微信号'}} {{item.primary ? '(主要)' : ''}}</view>
+            <view class="contact-value">{{item.account}}</view>
+          </view>
+          <view class="contact-actions">
+            <text class="action-text" bindtap="onEditWechat" data-index="{{index}}">编辑</text>
+            <text class="action-text delete" bindtap="onDeleteWechat" data-index="{{index}}">删除</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="empty-tip" wx:else>暂无微信号</view>
+    </view>
+
+    <!-- 其他联系方式 -->
+    <view class="section">
+      <view class="section-header">
+        <view class="section-title">其他联系方式</view>
+        <view class="add-btn-text" bindtap="onAddOther">+ 添加</view>
+      </view>
+      
+      <view class="contact-list" wx:if="{{formData.otherContacts.length > 0}}">
+        <view 
+          class="contact-item" 
+          wx:for="{{formData.otherContacts}}" 
+          wx:key="index">
+          <view class="contact-info">
+            <view class="contact-label">{{item.label}}</view>
+            <view class="contact-value">{{item.value}}</view>
+          </view>
+          <view class="contact-actions">
+            <text class="action-text" bindtap="onEditOther" data-index="{{index}}">编辑</text>
+            <text class="action-text delete" bindtap="onDeleteOther" data-index="{{index}}">删除</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="empty-tip" wx:else>暂无其他联系方式</view>
+    </view>
+
+    <!-- 在线客服配置 -->
+    <view class="section">
+      <view class="section-title">在线客服</view>
+      
+      <view class="form-item">
+        <view class="form-label">启用企业微信客服</view>
+        <switch 
+          checked="{{formData.customerService.enabled}}"
+          data-field="customerService.enabled"
+          bindchange="onSwitchChange" />
+      </view>
+
+      <block wx:if="{{formData.customerService.enabled}}">
+        <view class="form-item">
+          <view class="form-label">企业ID</view>
+          <input 
+            class="form-input" 
+            placeholder="企业微信的企业ID"
+            value="{{formData.customerService.corpId}}"
+            data-field="customerService.corpId"
+            bindinput="onInputChange" />
+        </view>
+
+        <view class="form-item">
+          <view class="form-label">客服链接</view>
+          <input 
+            class="form-input" 
+            placeholder="客服会话链接"
+            value="{{formData.customerService.customerServiceUrl}}"
+            data-field="customerService.customerServiceUrl"
+            bindinput="onInputChange" />
+        </view>
+      </block>
+    </view>
+
+    <!-- 保存按钮 -->
+    <view class="save-section">
+      <button 
+        class="save-btn {{saving ? 'disabled' : ''}}" 
+        bindtap="onSave"
+        disabled="{{saving}}">
+        {{saving ? '保存中...' : '保存'}}
+      </button>
+    </view>
+  </block>
+</view>
+
+<!-- 电话编辑弹窗 -->
+<view class="modal-mask" wx:if="{{showPhoneModal}}" catchtap="onPhoneModalCancel">
+  <view class="modal-content" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">{{editingPhone.index !== undefined ? '编辑电话' : '添加电话'}}</text>
+    </view>
+    <view class="modal-body">
+      <view class="modal-form-item">
+        <view class="modal-label">标签</view>
+        <input 
+          class="modal-input" 
+          placeholder="如：客服热线、预约电话"
+          value="{{editingPhone.label}}"
+          data-field="label"
+          catchinput="onPhoneInputChange"
+          adjust-position="{{true}}" />
+      </view>
+      <view class="modal-form-item">
+        <view class="modal-label required">电话号码</view>
+        <input 
+          class="modal-input" 
+          type="number"
+          placeholder="请输入电话号码"
+          value="{{editingPhone.number}}"
+          data-field="number"
+          catchinput="onPhoneInputChange"
+          adjust-position="{{true}}" />
+      </view>
+      <view class="modal-form-item">
+        <view class="modal-label">设为主要</view>
+        <switch 
+          checked="{{editingPhone.primary}}"
+          catchchange="onPhonePrimaryChange" />
+      </view>
+    </view>
+    <view class="modal-footer">
+      <view class="modal-btn cancel" catchtap="onPhoneModalCancel">取消</view>
+      <view class="modal-btn confirm" catchtap="onPhoneModalConfirm">确定</view>
+    </view>
+  </view>
+</view>
+
+<!-- 微信号编辑弹窗 -->
+<view class="modal-mask" wx:if="{{showWechatModal}}" catchtap="onWechatModalCancel">
+  <view class="modal-content" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">{{editingWechat.index !== undefined ? '编辑微信号' : '添加微信号'}}</text>
+    </view>
+    <view class="modal-body">
+      <view class="modal-form-item">
+        <view class="modal-label">标签</view>
+        <input 
+          class="modal-input" 
+          placeholder="如：客服微信、咨询微信"
+          value="{{editingWechat.label}}"
+          data-field="label"
+          catchinput="onWechatInputChange"
+          adjust-position="{{true}}" />
+      </view>
+      <view class="modal-form-item">
+        <view class="modal-label required">微信号</view>
+        <input 
+          class="modal-input" 
+          placeholder="请输入微信号"
+          value="{{editingWechat.account}}"
+          data-field="account"
+          catchinput="onWechatInputChange"
+          adjust-position="{{true}}" />
+      </view>
+      <view class="modal-form-item">
+        <view class="modal-label">二维码</view>
+        <view class="qrcode-preview" wx:if="{{editingWechat.qrcode}}">
+          <image class="qrcode-image" src="{{editingWechat.qrcode}}" mode="aspectFit"></image>
+        </view>
+        <view class="choose-btn" catchtap="onChooseWechatQrcode">
+          {{editingWechat.qrcode ? '更换二维码' : '上传二维码'}}
+        </view>
+      </view>
+      <view class="modal-form-item">
+        <view class="modal-label">设为主要</view>
+        <switch 
+          checked="{{editingWechat.primary}}"
+          catchchange="onWechatPrimaryChange" />
+      </view>
+    </view>
+    <view class="modal-footer">
+      <view class="modal-btn cancel" catchtap="onWechatModalCancel">取消</view>
+      <view class="modal-btn confirm" catchtap="onWechatModalConfirm">确定</view>
+    </view>
+  </view>
+</view>
+
+<!-- 其他联系方式编辑弹窗 -->
+<view class="modal-mask" wx:if="{{showOtherModal}}" catchtap="onOtherModalCancel">
+  <view class="modal-content" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">{{editingOther.index !== undefined ? '编辑联系方式' : '添加联系方式'}}</text>
+    </view>
+    <view class="modal-body">
+      <view class="modal-form-item">
+        <view class="modal-label">类型</view>
+        <picker 
+          mode="selector" 
+          range="{{[{value: 'xiaohongshu', label: '小红书'}, {value: 'douyin', label: '抖音'}, {value: 'weibo', label: '微博'}, {value: 'other', label: '其他'}]}}"
+          range-key="label"
+          value="{{editingOther.type === 'xiaohongshu' ? 0 : editingOther.type === 'douyin' ? 1 : editingOther.type === 'weibo' ? 2 : 3}}"
+          catchchange="onOtherTypeChange">
+          <view class="picker-input">
+            <text>{{editingOther.label || '请选择类型'}}</text>
+            <text class="arrow">></text>
+          </view>
+        </picker>
+      </view>
+      <view class="modal-form-item">
+        <view class="modal-label required">账号/ID</view>
+        <input 
+          class="modal-input" 
+          placeholder="请输入账号或ID"
+          value="{{editingOther.value}}"
+          data-field="value"
+          catchinput="onOtherInputChange"
+          adjust-position="{{true}}" />
+      </view>
+      <view class="modal-form-item">
+        <view class="modal-label">链接</view>
+        <input 
+          class="modal-input" 
+          placeholder="主页链接（可选）"
+          value="{{editingOther.link}}"
+          data-field="link"
+          catchinput="onOtherInputChange"
+          adjust-position="{{true}}" />
+      </view>
+    </view>
+    <view class="modal-footer">
+      <view class="modal-btn cancel" catchtap="onOtherModalCancel">取消</view>
+      <view class="modal-btn confirm" catchtap="onOtherModalConfirm">确定</view>
+    </view>
+  </view>
+</view>

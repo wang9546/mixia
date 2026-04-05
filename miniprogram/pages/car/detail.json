@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "婚车详情",
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "float-service": "/components/float-service/index"
+  }
+}

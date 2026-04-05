@@ -1,0 +1,168 @@
+<view class="page-container">
+  <view class="header-bar">
+    <text class="header-title">服务人员管理</text>
+    <button class="add-btn" bindtap="onAddTap">+ 新增</button>
+  </view>
+
+  <view class="list-section" wx:if="{{!loading}}">
+    <view class="list-item" wx:for="{{list}}" wx:key="_id">
+      <view class="item-content">
+        <image wx:if="{{item.avatar}}" class="item-avatar" src="{{item.avatar}}" mode="aspectFill"></image>
+        <view wx:else class="item-avatar-placeholder">👤</view>
+        <view class="item-info">
+          <text class="item-name">{{item.name}}</text>
+          <view class="item-meta">
+            <text class="item-type" wx:if="{{item.typeInfo}}">{{item.typeInfo.name}}</text>
+            <text class="item-title" wx:if="{{item.title}}">{{item.title}}</text>
+          </view>
+          <text class="item-exp" wx:if="{{item.experience}}">从业{{item.experience}}</text>
+        </view>
+        <view class="item-status {{item.status === 1 ? 'active' : 'inactive'}}">
+          {{item.status === 1 ? '启用' : '禁用'}}
+        </view>
+      </view>
+      <view class="item-actions">
+        <button class="action-btn works" bindtap="onWorksTap" data-item="{{item}}">作品</button>
+        <button class="action-btn edit" bindtap="onEditTap" data-item="{{item}}">编辑</button>
+        <button class="action-btn delete" bindtap="onDeleteTap" data-item="{{item}}">删除</button>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:if="{{list.length === 0}}">
+      <text class="empty-text">暂无数据</text>
+    </view>
+  </view>
+
+  <view class="loading-container" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <view class="form-modal" wx:if="{{showForm}}">
+    <view class="form-mask" bindtap="onCloseForm"></view>
+    <scroll-view class="form-content" scroll-y="{{true}}">
+      <view class="form-header">
+        <text class="form-title">{{editingItem ? '编辑' : '新增'}}人员</text>
+        <text class="form-close" bindtap="onCloseForm">×</text>
+      </view>
+      
+      <view class="form-body">
+        <view class="form-item">
+          <text class="form-label">姓名 *</text>
+          <input class="form-input" value="{{formData.name}}" bindinput="onInputChange" data-key="name" placeholder="请输入姓名" />
+        </view>
+        
+        <view class="form-item">
+          <text class="form-label">类型</text>
+          <picker mode="selector" range="{{types}}" range-key="name" bindchange="onTypeChange" value="{{typeIndex}}">
+            <view class="form-picker">
+              <text>{{types[typeIndex].name || '请选择类型'}}</text>
+              <text class="picker-arrow">▼</text>
+            </view>
+          </picker>
+        </view>
+        
+        <view class="form-item">
+          <text class="form-label">头像</text>
+          <view class="image-picker avatar-picker" bindtap="onAvatarChoose">
+            <image wx:if="{{formData.avatar}}" class="preview-avatar" src="{{formData.avatar}}" mode="aspectFill"></image>
+            <view wx:else class="image-placeholder">+ 上传头像</view>
+          </view>
+        </view>
+        
+        <view class="form-item">
+          <text class="form-label">职称/头衔</text>
+          <input class="form-input" value="{{formData.title}}" bindinput="onInputChange" data-key="title" placeholder="如：资深摄影师" />
+        </view>
+        
+        <view class="form-item">
+          <text class="form-label">从业时间</text>
+          <input class="form-input" value="{{formData.experience}}" bindinput="onInputChange" data-key="experience" placeholder="如：5年" />
+        </view>
+        
+        <view class="form-item">
+          <text class="form-label">个人介绍</text>
+          <textarea class="form-textarea" value="{{formData.introduction}}" bindinput="onInputChange" data-key="introduction" placeholder="请输入个人介绍"></textarea>
+        </view>
+        
+        <view class="form-item">
+          <text class="form-label">排序</text>
+          <input class="form-input" type="number" value="{{formData.sort}}" bindinput="onInputChange" data-key="sort" placeholder="数字越小越靠前" />
+        </view>
+        
+        <view class="form-item">
+          <text class="form-label">状态</text>
+          <switch checked="{{formData.status === 1}}" bindchange="onSwitchChange" data-key="status" />
+        </view>
+      </view>
+      
+      <view class="form-footer">
+        <button class="form-btn cancel" bindtap="onCloseForm">取消</button>
+        <button class="form-btn submit" bindtap="onSubmit">保存</button>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="works-modal" wx:if="{{showWorksModal}}">
+    <view class="works-mask" bindtap="closeWorksModal"></view>
+    <view class="works-content">
+      <view class="works-header">
+        <text class="works-title">配置作品 - {{editingItem.name}}</text>
+        <text class="works-close" bindtap="closeWorksModal">×</text>
+      </view>
+      
+      <scroll-view class="works-body" scroll-y="{{true}}">
+        <view class="works-section">
+          <view class="section-title">已关联作品</view>
+          <view class="staff-works-list" wx:if="{{staffWorks.length > 0}}">
+            <view class="staff-work-item" wx:for="{{staffWorks}}" wx:key="_id">
+              <image class="work-cover" src="{{item.workCover}}" mode="aspectFill"></image>
+              <view class="work-info">
+                <text class="work-title">{{item.workTitle}}</text>
+                <text class="work-type">{{getWorkTypeName(item.workType)}}</text>
+              </view>
+              <view class="work-remove" bindtap="onWorkRemove" data-id="{{item._id}}">×</view>
+            </view>
+          </view>
+          <view class="empty-works" wx:else>
+            <text>暂无关联作品</text>
+          </view>
+        </view>
+
+        <view class="works-section">
+          <view class="section-title">添加作品</view>
+          <view class="work-type-tabs">
+            <view 
+              class="type-tab {{currentWorkType === item.id ? 'active' : ''}}" 
+              wx:for="{{workTypes}}" 
+              wx:key="id"
+              bindtap="onWorkTypeChange"
+              data-id="{{item.id}}"
+            >
+              {{item.name}}
+            </view>
+          </view>
+          
+          <view class="available-works-grid">
+            <view 
+              class="available-work-item {{selectedWorks.indexOf(item._id) > -1 ? 'selected' : ''}}" 
+              wx:for="{{availableWorks}}" 
+              wx:key="_id"
+              bindtap="onWorkSelect"
+              data-id="{{item._id}}"
+            >
+              <image class="work-thumb" src="{{item.coverImage}}" mode="aspectFill"></image>
+              <view class="work-checkbox"></view>
+              <text class="work-name">{{item.title}}</text>
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+      
+      <view class="works-footer">
+        <button class="works-btn cancel" bindtap="closeWorksModal">关闭</button>
+        <button class="works-btn submit" bindtap="addSelectedWorks">添加选中 ({{selectedWorks.length}})</button>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,187 @@
+<view class="page-container" wx:if="{{!loading && bookingInfo}}">
+  <view class="status-section">
+    <view class="status-badge {{bookingInfo.statusClass}}">
+      <text class="status-icon">{{bookingInfo.status === 'pending' ? '◐' : bookingInfo.status === 'confirmed' ? '✓' : bookingInfo.status === 'completed' ? '✦' : '✕'}}</text>
+      <text class="status-text">{{bookingInfo.statusText}}</text>
+    </view>
+  </view>
+
+  <view class="info-card">
+    <view class="card-header">
+      <text class="card-title">预约信息</text>
+    </view>
+    <view class="card-body">
+      <view class="info-row">
+        <text class="info-label">预约编号</text>
+        <text class="info-value">{{bookingInfo.orderNo}}</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">预约日期</text>
+        <text class="info-value">{{bookingInfo.bookingDate}}</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">新郎姓名</text>
+        <text class="info-value">{{bookingInfo.groomName}}</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">新娘姓名</text>
+        <text class="info-value">{{bookingInfo.brideName}}</text>
+      </view>
+      <view class="info-row" bindtap="onCallPhone">
+        <text class="info-label">联系电话</text>
+        <text class="info-value primary">{{bookingInfo.phone}}</text>
+        <text class="info-action">拨打</text>
+      </view>
+      <view class="info-row" wx:if="{{bookingInfo.wechat}}">
+        <text class="info-label">微信号</text>
+        <text class="info-value">{{bookingInfo.wechat}}</text>
+      </view>
+      <view class="info-row" wx:if="{{bookingInfo.remark}}">
+        <text class="info-label">客户备注</text>
+        <text class="info-value">{{bookingInfo.remark}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="info-card">
+    <view class="card-header">
+      <text class="card-title">服务配置</text>
+      <text class="card-tip" wx:if="{{bookingInfo.status === 'pending'}}">点击添加服务</text>
+    </view>
+    <view class="card-body">
+      <view class="service-item">
+        <view class="service-label">婚车服务</view>
+        <view class="car-list" wx:if="{{selectedCars.length > 0}}">
+          <view class="car-row" wx:for="{{selectedCars}}" wx:key="id">
+            <view class="car-info">
+              <text class="car-name">{{item.name}}</text>
+              <text class="car-desc" wx:if="{{item.brandName || item.colorName}}">{{item.brandName}} · {{item.colorName}}</text>
+            </view>
+            <view class="car-quantity">
+              <view class="quantity-btn" bindtap="onCarQuantityMinus" data-index="{{index}}">-</view>
+              <input class="quantity-input" type="number" value="{{item.quantity}}" bindinput="onCarQuantityChange" data-index="{{index}}" />
+              <view class="quantity-btn" bindtap="onCarQuantityPlus" data-index="{{index}}">+</view>
+            </view>
+            <input class="car-remark" placeholder="备注" value="{{item.remark}}" bindinput="onCarRemarkInput" data-index="{{index}}" />
+            <text class="remove-btn" catchtap="removeCar" data-index="{{index}}">移除</text>
+          </view>
+        </view>
+        <button class="add-btn" bindtap="openCarPicker">+ 添加婚车</button>
+      </view>
+
+      <view class="service-item staff-item">
+        <view class="service-label">服务人员</view>
+        <view class="staff-list" wx:if="{{selectedStaff.length > 0}}">
+          <view class="staff-row" wx:for="{{selectedStaff}}" wx:key="id">
+            <view class="staff-info">
+              <text class="staff-name">{{item.name}}</text>
+              <text class="staff-type">{{item.typeName}}</text>
+            </view>
+            <text class="remove-btn" catchtap="removeStaff" data-index="{{index}}">移除</text>
+          </view>
+        </view>
+        <button class="add-btn" bindtap="openStaffPicker">+ 添加人员</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="info-card">
+    <view class="card-header">
+      <text class="card-title">客服备注</text>
+    </view>
+    <view class="card-body">
+      <textarea 
+        class="remark-input" 
+        placeholder="请输入客服备注信息..."
+        value="{{adminRemark}}"
+        bindinput="onAdminRemarkInput"
+        maxlength="500"
+      />
+    </view>
+  </view>
+
+  <view class="time-info">
+    <text class="time-text">创建时间: {{bookingInfo.createTime}}</text>
+    <text class="time-text" wx:if="{{bookingInfo.confirmTime}}">确认时间: {{bookingInfo.confirmTime}}</text>
+  </view>
+
+  <view class="bottom-bar safe-area-bottom">
+    <block wx:if="{{bookingInfo.status === 'pending'}}">
+      <button class="btn-cancel" bindtap="onCancel">取消预约</button>
+      <button class="btn-save" bindtap="onSave" disabled="{{saving}}">保存</button>
+      <button class="btn-confirm" bindtap="onConfirm" disabled="{{saving}}">确认预约</button>
+    </block>
+    <block wx:elif="{{bookingInfo.status === 'confirmed'}}">
+      <button class="btn-save" bindtap="onSave" disabled="{{saving}}">保存</button>
+      <button class="btn-poster" bindtap="generatePoster">生成海报</button>
+      <button class="btn-complete" bindtap="onComplete">标记完成</button>
+    </block>
+    <block wx:elif="{{bookingInfo.status === 'completed'}}">
+      <button class="btn-save" bindtap="onSave" disabled="{{saving}}">保存</button>
+      <button class="btn-poster" bindtap="generatePoster">生成海报</button>
+    </block>
+    <block wx:else>
+      <button class="btn-back" bindtap="wx.navigateBack">返回</button>
+    </block>
+  </view>
+</view>
+
+<view class="loading-container" wx:if="{{loading}}">
+  <view class="loading-spinner"></view>
+  <text class="loading-text">加载中...</text>
+</view>
+
+<view class="modal-mask" wx:if="{{showCarPicker}}" catchtap="closeCarPicker">
+  <view class="modal-content picker-modal" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">选择婚车</text>
+      <text class="modal-close" bindtap="closeCarPicker">×</text>
+    </view>
+    <scroll-view class="picker-list" scroll-y>
+      <view class="picker-item" wx:for="{{carList}}" wx:key="_id" bindtap="onCarSelect" data-id="{{item._id}}">
+        <image class="picker-image" src="{{item.coverImage}}" mode="aspectFill"></image>
+        <view class="picker-info">
+          <text class="picker-name">{{item.name}}</text>
+          <text class="picker-desc">{{item.brandInfo.name}} · {{item.colorInfo.name}}</text>
+        </view>
+      </view>
+      <view class="picker-empty" wx:if="{{carList.length === 0}}">
+        <text>暂无婚车数据</text>
+      </view>
+    </scroll-view>
+  </view>
+</view>
+
+<view class="modal-mask" wx:if="{{showStaffPicker}}" catchtap="closeStaffPicker">
+  <view class="modal-content picker-modal" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">选择服务人员</text>
+      <text class="modal-close" bindtap="closeStaffPicker">×</text>
+    </view>
+    <scroll-view class="picker-list" scroll-y>
+      <view class="picker-item" wx:for="{{staffList}}" wx:key="_id" bindtap="onStaffSelect" data-id="{{item._id}}">
+        <image class="picker-avatar" src="{{item.avatar || '/images/icons/avatar.png'}}" mode="aspectFill"></image>
+        <view class="picker-info">
+          <text class="picker-name">{{item.name}}</text>
+          <text class="picker-desc">{{item.typeInfo.name}}</text>
+        </view>
+      </view>
+      <view class="picker-empty" wx:if="{{staffList.length === 0}}">
+        <text>暂无人员数据</text>
+      </view>
+    </scroll-view>
+  </view>
+</view>
+
+<view class="modal-mask" wx:if="{{showPoster}}" catchtap="closePoster">
+  <view class="poster-container" catchtap="stopPropagation">
+    <view class="poster-header">
+      <text class="poster-title">预约成功海报</text>
+      <text class="modal-close" bindtap="closePoster">×</text>
+    </view>
+    <canvas type="2d" id="posterCanvas" class="poster-canvas"></canvas>
+    <view class="poster-footer">
+      <button class="btn-save-poster" bindtap="savePoster">保存到相册</button>
+    </view>
+  </view>
+</view>

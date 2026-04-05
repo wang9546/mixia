@@ -1,0 +1,127 @@
+<view class="page-container" wx:if="{{!loading && bookingInfo}}">
+  <view class="status-section">
+    <view class="status-icon-wrap">
+      <text class="status-icon">{{bookingInfo.status === 'pending' ? '◐' : bookingInfo.status === 'confirmed' ? '✓' : bookingInfo.status === 'completed' ? '✦' : '✕'}}</text>
+    </view>
+    <view class="status-text {{bookingInfo.statusClass}}">
+      {{bookingInfo.statusText}}
+    </view>
+    <view class="status-desc" wx:if="{{bookingInfo.status === 'pending'}}">
+      我们将在24小时内与您联系确认
+    </view>
+  </view>
+
+  <view class="info-section">
+    <view class="section-header">
+      <text class="section-icon">◈</text>
+      <text class="section-title">预约信息</text>
+    </view>
+    
+    <view class="info-item">
+      <text class="info-label">预约编号</text>
+      <text class="info-value">{{bookingInfo.orderNo}}</text>
+    </view>
+    
+    <view class="info-item">
+      <text class="info-label">预约日期</text>
+      <text class="info-value">{{bookingInfo.bookingDate}}</text>
+    </view>
+    
+    <view class="info-item" wx:if="{{bookingInfo.remark}}">
+      <text class="info-label">备注信息</text>
+      <text class="info-value">{{bookingInfo.remark}}</text>
+    </view>
+  </view>
+
+  <view class="info-section">
+    <view class="section-header">
+      <text class="section-icon">◈</text>
+      <text class="section-title">联系信息</text>
+    </view>
+    
+    <view class="info-item">
+      <text class="info-label">新郎姓名</text>
+      <text class="info-value">{{bookingInfo.groomName}}</text>
+    </view>
+    
+    <view class="info-item">
+      <text class="info-label">新娘姓名</text>
+      <text class="info-value">{{bookingInfo.brideName}}</text>
+    </view>
+    
+    <view class="info-item" bindtap="onCallPhone">
+      <text class="info-label">联系电话</text>
+      <text class="info-value primary">{{bookingInfo.phone}}</text>
+    </view>
+    
+    <view class="info-item" wx:if="{{bookingInfo.wechat}}">
+      <text class="info-label">微信号</text>
+      <text class="info-value">{{bookingInfo.wechat}}</text>
+    </view>
+  </view>
+
+  <view class="info-section" wx:if="{{bookingInfo.services && (bookingInfo.services.cars.length > 0 || bookingInfo.services.staff.length > 0)}}">
+    <view class="section-header">
+      <text class="section-icon">◈</text>
+      <text class="section-title">服务详情</text>
+    </view>
+    
+    <view class="service-item" wx:if="{{bookingInfo.services.cars.length > 0}}">
+      <view class="service-title">婚车服务</view>
+      <view class="service-list">
+        <view class="service-row" wx:for="{{bookingInfo.services.cars}}" wx:key="id">
+          <text class="service-name">{{item.name}}</text>
+          <text class="service-quantity">x{{item.quantity}}</text>
+          <text class="service-remark" wx:if="{{item.remark}}">{{item.remark}}</text>
+        </view>
+      </view>
+    </view>
+    
+    <view class="service-item" wx:if="{{bookingInfo.services.staff.length > 0}}">
+      <view class="service-title">服务人员</view>
+      <view class="staff-list">
+        <view class="staff-item" wx:for="{{bookingInfo.services.staff}}" wx:key="id">
+          <image class="staff-avatar" src="{{item.detail.avatar || '/images/icons/avatar.png'}}" mode="aspectFill"></image>
+          <view class="staff-info">
+            <text class="staff-name">{{item.name}}</text>
+            <text class="staff-type">{{item.typeName}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="info-section" wx:if="{{bookingInfo.adminRemark}}">
+    <view class="section-header">
+      <text class="section-icon">◈</text>
+      <text class="section-title">客服备注</text>
+    </view>
+    <view class="admin-remark">{{bookingInfo.adminRemark}}</view>
+  </view>
+
+  <view class="time-section">
+    <view class="time-item">
+      <text class="time-label">创建时间</text>
+      <text class="time-value">{{bookingInfo.createTime}}</text>
+    </view>
+    <view class="time-item" wx:if="{{bookingInfo.confirmTime}}">
+      <text class="time-label">确认时间</text>
+      <text class="time-value">{{bookingInfo.confirmTime}}</text>
+    </view>
+    <view class="time-item" wx:if="{{bookingInfo.cancelTime}}">
+      <text class="time-label">取消时间</text>
+      <text class="time-value">{{bookingInfo.cancelTime}}</text>
+    </view>
+  </view>
+
+  <view class="bottom-bar safe-area-bottom" wx:if="{{bookingInfo.status === 'pending'}}">
+    <button class="cancel-btn" bindtap="onCancelBooking">取消预约</button>
+  </view>
+</view>
+
+<view class="loading-container" wx:if="{{loading}}">
+  <view class="loading-content">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+</view>

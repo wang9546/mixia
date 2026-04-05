@@ -1,0 +1,223 @@
+<view class="page-container">
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-content">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
+  </view>
+
+  <block wx:if="{{!loading && storeInfo}}">
+    <!-- 门店图片轮播 -->
+    <view class="store-images" wx:if="{{storeInfo.images && storeInfo.images.length > 0}}">
+      <swiper 
+        class="image-swiper"
+        indicator-dots="{{storeInfo.images.length > 1}}"
+        autoplay="{{true}}"
+        interval="{{5000}}"
+        duration="{{500}}"
+        indicator-color="rgba(255,255,255,0.4)"
+        indicator-active-color="#C9A96E"
+        circular="{{true}}">
+        <swiper-item wx:for="{{storeInfo.images}}" wx:key="index">
+          <image 
+            class="store-image" 
+            src="{{item}}" 
+            mode="aspectFill"
+            bindtap="onPreviewImage"
+            data-url="{{item}}">
+          </image>
+        </swiper-item>
+      </swiper>
+    </view>
+
+    <!-- 门店信息头部 -->
+    <view class="store-header">
+      <view class="store-name">{{storeInfo.name}}</view>
+      <view class="store-desc" wx:if="{{storeInfo.description}}">{{storeInfo.description}}</view>
+    </view>
+
+    <!-- 地址信息 -->
+    <view class="info-card" wx:if="{{storeInfo.province || storeInfo.city || storeInfo.address}}">
+      <view class="info-item" bindtap="onOpenLocation">
+        <view class="info-icon-wrap location-icon">
+          <image class="info-icon-img" src="/images/icons/location.svg" mode="aspectFit"></image>
+        </view>
+        <view class="info-content">
+          <view class="info-label">门店地址</view>
+          <view class="info-value">{{storeInfo.province || ''}}{{storeInfo.city || ''}}{{storeInfo.district || ''}}{{storeInfo.address || ''}}</view>
+        </view>
+        <view class="info-action">
+          <text class="action-text">导航</text>
+          <text class="action-arrow">></text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 电话列表 -->
+    <view class="contact-section" wx:if="{{storeInfo.phones && storeInfo.phones.length > 0}}">
+      <view class="section-header">
+        <text class="section-subtitle">PHONE</text>
+        <text class="section-title">联系电话</text>
+      </view>
+      <view class="contact-list">
+        <view 
+          class="contact-item" 
+          wx:for="{{storeInfo.phones}}" 
+          wx:key="index"
+          bindtap="onCallPhone"
+          data-number="{{item.number}}">
+          <view class="contact-icon-wrap phone-icon">
+            <image class="contact-icon-img" src="/images/icons/phone.svg" mode="aspectFit"></image>
+          </view>
+          <view class="contact-content">
+            <view class="contact-label">
+              <text>{{item.label || '电话'}}</text>
+              <text class="primary-tag" wx:if="{{item.primary}}">主要</text>
+            </view>
+            <view class="contact-value">{{item.number}}</view>
+          </view>
+          <view class="contact-action">
+            <text class="action-btn">拨打</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 微信号列表 -->
+    <view class="contact-section" wx:if="{{storeInfo.wechats && storeInfo.wechats.length > 0}}">
+      <view class="section-header">
+        <text class="section-subtitle">WECHAT</text>
+        <text class="section-title">微信号</text>
+      </view>
+      <view class="contact-list">
+        <view 
+          class="contact-item" 
+          wx:for="{{storeInfo.wechats}}" 
+          wx:key="index">
+          <view class="contact-icon-wrap wechat-icon">
+            <image class="contact-icon-img" src="/images/icons/wechat.svg" mode="aspectFit"></image>
+          </view>
+          <view class="contact-content">
+            <view class="contact-label">
+              <text>{{item.label || '微信号'}}</text>
+              <text class="primary-tag" wx:if="{{item.primary}}">主要</text>
+            </view>
+            <view class="contact-value">{{item.account}}</view>
+          </view>
+          <view class="contact-actions">
+            <view 
+              class="action-btn-wrap" 
+              bindtap="onCopyWechat" 
+              data-account="{{item.account}}">
+              <text class="action-btn">复制</text>
+            </view>
+            <view 
+              class="action-btn-wrap qrcode-btn" 
+              wx:if="{{item.qrcode}}"
+              bindtap="onPreviewQrcode" 
+              data-qrcode="{{item.qrcode}}">
+              <text class="action-btn">二维码</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 其他联系方式 -->
+    <view class="contact-section" wx:if="{{storeInfo.otherContacts && storeInfo.otherContacts.length > 0}}">
+      <view class="section-header">
+        <text class="section-subtitle">OTHER</text>
+        <text class="section-title">其他联系方式</text>
+      </view>
+      <view class="contact-list">
+        <view 
+          class="contact-item" 
+          wx:for="{{storeInfo.otherContacts}}" 
+          wx:key="index"
+          bindtap="onOtherContactTap"
+          data-type="{{item.type}}"
+          data-value="{{item.value}}"
+          data-link="{{item.link}}">
+          <view class="contact-icon-wrap other-icon">
+            <text class="contact-icon-text">{{item.type === 'xiaohongshu' ? '红' : item.type === 'douyin' ? '音' : item.type === 'weibo' ? '微' : '联'}}</text>
+          </view>
+          <view class="contact-content">
+            <view class="contact-label">
+              <text>{{item.label || item.type}}</text>
+            </view>
+            <view class="contact-value">{{item.value}}</view>
+          </view>
+          <view class="contact-action">
+            <text class="action-btn">{{item.link ? '查看' : '复制'}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 营业时间 -->
+    <view class="info-card" wx:if="{{storeInfo.businessHours}}">
+      <view class="info-item">
+        <view class="info-icon-wrap time-icon">
+          <image class="info-icon-img" src="/images/icons/time.svg" mode="aspectFit"></image>
+        </view>
+        <view class="info-content">
+          <view class="info-label">营业时间</view>
+          <view class="info-value">{{storeInfo.businessHours}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 在线客服 -->
+    <view class="customer-service-section">
+      <view class="section-header">
+        <text class="section-subtitle">ONLINE SERVICE</text>
+        <text class="section-title">在线客服</text>
+      </view>
+      <button 
+        class="customer-service-btn" 
+        open-type="contact">
+        <image class="btn-icon-img" src="/images/icons/customer-service.svg" mode="aspectFit"></image>
+        <text class="btn-text">联系微信客服</text>
+      </button>
+    </view>
+
+    <!-- 地图位置 -->
+    <view class="map-section" wx:if="{{storeInfo.latitude && storeInfo.longitude}}">
+      <view class="section-header">
+        <text class="section-subtitle">LOCATION</text>
+        <text class="section-title">门店位置</text>
+      </view>
+      <map 
+        class="store-map"
+        longitude="{{storeInfo.longitude}}"
+        latitude="{{storeInfo.latitude}}"
+        scale="18"
+        show-location="{{true}}"
+        markers="{{[{id: 1, longitude: storeInfo.longitude, latitude: storeInfo.latitude, title: storeInfo.name, iconPath: '/images/icons/location.svg', width: 32, height: 32}]}}"
+        bindtap="onOpenLocation">
+      </map>
+    </view>
+  </block>
+
+  <!-- 空状态 -->
+  <view wx:if="{{!loading && !storeInfo}}" class="empty-state">
+    <view class="empty-icon-wrap">
+      <image class="empty-icon" src="/images/icons/empty.svg" mode="aspectFit"></image>
+    </view>
+    <text class="empty-text">暂无门店信息</text>
+  </view>
+
+  <!-- 温馨提示 -->
+  <view class="tips-section" wx:if="{{!loading && storeInfo}}">
+    <view class="tips-header">
+      <image class="tips-icon" src="/images/icons/question.svg" mode="aspectFit"></image>
+      <text class="tips-title">温馨提示</text>
+    </view>
+    <view class="tips-content">
+      <view class="tip-item">营业时间内，我们将在30分钟内回复您的咨询</view>
+      <view class="tip-item">非营业时间，请留言，我们会在第一时间联系您</view>
+      <view class="tip-item">如需紧急联系，请拨打客服电话</view>
+    </view>
+  </view>
+</view>
