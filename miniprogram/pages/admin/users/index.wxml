@@ -1,0 +1,37 @@
+<view class="users-container">
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <input class="search-input" placeholder="搜索用户昵称..." value="{{keyword}}" bindinput="onSearchInput" />
+  </view>
+
+  <!-- 统计信息 -->
+  <view class="stats-bar">
+    <text class="stats-text">共 {{total}} 位用户</text>
+  </view>
+
+  <!-- 用户列表 -->
+  <view class="users-list">
+    <view class="user-item" wx:for="{{users}}" wx:key="_id">
+      <image class="user-avatar" src="{{item.avatarUrl || '/images/tabbar/user.png'}}" mode="aspectFill"></image>
+      <view class="user-info">
+        <view class="user-name">{{item.nickName || '微信用户'}}</view>
+        <view class="user-meta">
+          <text class="user-time">注册: {{item.create_time}}</text>
+        </view>
+      </view>
+      <view class="user-badge {{item.isAdmin ? 'admin' : ''}}">
+        {{item.isAdmin ? '管理员' : '用户'}}
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载更多 -->
+  <view class="load-more" wx:if="{{hasMore}}" bindtap="loadMore">
+    <text>加载更多</text>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{users.length === 0 && !loading}}">
+    <text class="empty-text">暂无用户</text>
+  </view>
+</view>

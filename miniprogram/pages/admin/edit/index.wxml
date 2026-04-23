@@ -1,0 +1,110 @@
+<view class="edit-container">
+  <form bindsubmit="onSubmit">
+    <!-- 基本信息 -->
+    <view class="form-section">
+      <view class="section-title">基本信息</view>
+      
+      <view class="form-item">
+        <text class="form-label">{{nameLabel}}</text>
+        <input class="form-input" name="name" value="{{formData.name}}" placeholder="请输入{{nameLabel}}" />
+      </view>
+      
+      <view class="form-item" wx:if="{{type !== 'vendor'}}">
+        <text class="form-label">价格</text>
+        <input class="form-input" name="price" type="digit" value="{{formData.price}}" placeholder="请输入价格（0表示面议）" />
+      </view>
+      
+      <view class="form-item" wx:if="{{type === 'vendor'}}">
+        <text class="form-label">价格区间</text>
+        <input class="form-input" name="price_range" value="{{formData.price_range}}" placeholder="如：3000-5000" />
+      </view>
+      
+      <view class="form-item">
+        <text class="form-label">描述</text>
+        <textarea class="form-textarea" name="description" value="{{formData.description}}" placeholder="请输入描述" maxlength="500" />
+      </view>
+    </view>
+
+    <!-- 封面图 -->
+    <view class="form-section">
+      <view class="section-title">封面图</view>
+      <view class="image-upload">
+        <view class="image-item" wx:if="{{formData.cover_image}}">
+          <image src="{{formData.cover_image}}" mode="aspectFill" bindtap="previewImage" data-url="{{formData.cover_image}}"></image>
+          <view class="delete-btn" bindtap="deleteCover">×</view>
+        </view>
+        <view class="upload-btn" wx:else bindtap="uploadCover">
+          <text>+</text>
+          <text class="upload-text">上传封面</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 图片列表 -->
+    <view class="form-section">
+      <view class="section-title">图片列表</view>
+      <view class="image-upload">
+        <view class="image-item" wx:for="{{formData.images}}" wx:key="*this">
+          <image src="{{item}}" mode="aspectFill" bindtap="previewImage" data-url="{{item}}"></image>
+          <view class="delete-btn" bindtap="deleteImage" data-index="{{index}}">×</view>
+        </view>
+        <view class="upload-btn" bindtap="uploadImage">
+          <text>+</text>
+          <text class="upload-text">添加图片</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 标签选择 -->
+    <wxs module="tagFn">
+      module.exports = {
+        isSelected: function(tags, id) {
+          if (!tags) return false;
+          return tags.indexOf(id) !== -1;
+        }
+      }
+    </wxs>
+    <view class="form-section">
+      <view class="section-title">分类标签</view>
+      
+      <view class="form-item">
+        <text class="form-label">标签</text>
+        <view class="tag-select">
+          <view class="tag-option {{tagFn.isSelected(formData.level1_tags, item._id) ? 'selected' : ''}}" 
+                wx:for="{{level1Tags}}" wx:key="_id" 
+                bindtap="toggleTag" data-id="{{item._id}}" data-level="1">
+            {{item.name}}
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 精选设置 -->
+    <view class="form-section">
+      <view class="section-title">精选设置</view>
+      <view class="form-item switch-item">
+        <text class="form-label">精选推荐</text>
+        <switch checked="{{formData.is_featured}}" bindchange="onFeaturedChange" color="#B8905F" />
+        <text class="form-hint">开启后将显示在首页推荐</text>
+      </view>
+    </view>
+
+    <!-- 状态设置 -->
+    <view class="form-section">
+      <view class="section-title">状态设置</view>
+      <view class="form-item switch-item">
+        <text class="form-label">是否上架</text>
+        <switch checked="{{formData.is_active}}" bindchange="onSwitchChange" color="#667eea" />
+      </view>
+      <view class="form-item">
+        <text class="form-label">排序值</text>
+        <input class="form-input" name="sort_order" type="number" value="{{formData.sort_order}}" placeholder="数值越大越靠前" />
+      </view>
+    </view>
+
+    <!-- 提交按钮 -->
+    <view class="form-actions">
+      <button class="submit-btn" form-type="submit">保存</button>
+    </view>
+  </form>
+</view>

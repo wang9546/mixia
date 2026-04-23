@@ -1,164 +1,165 @@
-const MAX_IMAGE_SIZE = 3 * 1024 * 1024;
-const MAX_VIDEO_SIZE = 5 * 1024 * 1024;
+/**
+ * 图片视频压缩工具
+ */
 
-async function compressImage(filePath) {
-  const fileInfo = await wx.getFileInfo({ filePath });
-  const fileSize = fileInfo.size;
-  if (fileSize <= MAX_IMAGE_SIZE) {
-    return filePath;
-  }
+const logger = require('./logger.js');
 
-  let quality = 0.95;
-  let compressedPath = filePath;
-
-  while (quality >= 0.1) {
-    try {
-      const res = await wx.compressImage({
-        src: filePath,
-        quality: Math.round(quality * 100)
-      });
-
-      const compressedInfo = await wx.getFileInfo({ filePath: res.tempFilePath });
-
-      if (compressedInfo.size <= MAX_IMAGE_SIZE) {
-        compressedPath = res.tempFilePath;
-        break;
-      }
-
-      quality -= 0.005;
-    } catch (err) {
-      console.error('图片压缩失败:', err);
-      break;
-    }
-  }
-
-  return compressedPath;
-}
-
-async function compressVideo(filePath) {
-  const fileInfo = await wx.getFileInfo({ filePath });
-  const fileSize = fileInfo.size;
-
-  if (fileSize <= MAX_VIDEO_SIZE) {
-    console.log('视频大小符合要求，无需压缩');
-    return filePath;
-  }
-
-  try {
-    console.log('开始压缩视频，原始大小:', (fileSize / 1024 / 1024).toFixed(2), 'MB');
-    
-    const res = await wx.compressVideo({
-      src: filePath,
-      quality: 'low',
-      bitrate: 1000,
-      fps: 30,
-      resolution: 720
-    });
-
-    const compressedInfo = await wx.getFileInfo({ filePath: res.tempFilePath });
-    console.log('压缩后大小:', (compressedInfo.size / 1024 / 1024).toFixed(2), 'MB');
-
-    if (compressedInfo.size < fileSize) {
-      console.log('压缩成功，使用压缩后的视频');
-      return res.tempFilePath;
-    } else {
-      console.log('压缩后反而更大，使用原始视频');
-      return filePath;
-    }
-  } catch (err) {
-    console.error('视频压缩失败，使用原始视频:', err);
-    return filePath;
-  }
-}
-
-async function chooseAndCompressImage(options) {
-  const count = options && options.count ? options.count : 1;
-  const sourceType = options && options.sourceType ? options.sourceType : ['album', 'camera'];
-
+const compressImage = (tempFilePath, quality = 80) => {
   return new Promise((resolve, reject) => {
-    wx.chooseImage({
-      count,
-      sizeType: ['original'],
-      sourceType,
-      success: async (res) => {
-        wx.showLoading({ title: '处理中...' });
-
-        try {
-          const compressedPaths = [];
-
-          for (const filePath of res.tempFilePaths) {
-            const compressedPath = await compressImage(filePath);
-            compressedPaths.push(compressedPath);
-          }
-
-          wx.hideLoading();
-          resolve(compressedPaths);
-        } catch (err) {
-          wx.hideLoading();
-          reject(err);
-        }
-      },
-      fail: reject
-    });
-  });
-}
-
-async function chooseAndCompressVideo(options) {
-  const sourceType = options && options.sourceType ? options.sourceType : ['album', 'camera'];
-  const maxDuration = options && options.maxDuration ? options.maxDuration : 60;
-
-  return new Promise((resolve, reject) => {
-    wx.chooseVideo({
-      sourceType,
-      maxDuration,
-      success: async (res) => {
-        wx.showLoading({ title: '处理中...' });
-
-        try {
-          let compressedPath = res.tempFilePath;
-          
-          try {
-            compressedPath = await compressVideo(res.tempFilePath);
-          } catch (compressErr) {
-            console.error('视频压缩失败，使用原视频:', compressErr);
-          }
-          
-          wx.hideLoading();
-          resolve({
-            tempFilePath: compressedPath,
-            duration: res.duration,
-            size: res.size,
-            width: res.width,
-            height: res.height
-          });
-        } catch (err) {
-          wx.hideLoading();
-          reject(err);
-        }
+    wx.compressImage({
+      src: tempFilePath,
+      quality: quality,
+      success: (res) => {
+        resolve(res.tempFilePath);
       },
       fail: (err) => {
-        console.error('选择视频失败:', err);
-        reject(err);
+        logger.warn('图片压缩失败，使用原图', err);
+        resolve(tempFilePath);
       }
     });
   });
-}
+};
 
-async function uploadFile(filePath, cloudPath) {
-  const res = await wx.cloud.uploadFile({
-    cloudPath,
-    filePath
+const compressVideo = (tempFilePath, quality = 'medium') => {
+  return new Promise((resolve, reject) => {
+    wx.compressVideo({
+      src: tempFilePath,
+      quality: quality,
+      success: (res) => {
+        resolve(res.tempFilePath);
+      },
+      fail: (err) => {
+        logger.warn('视频压缩失败，使用原视频', err);
+        resolve(tempFilePath);
+      }
+    });
+  });
+};
+
+const getFileSize = (filePath) => {
+  return new Promise((resolve, reject) => {
+    wx.getFileSystemManager().getFileInfo({
+      filePath: filePath,
+      success: (res) => {
+        resolve(res.size);
+      },
+      fail: (err) => {
+        resolve(0);
+      }
+    });
+  });
+};
+
+const formatFileSize = (bytes) => {
+  if (bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+};
+
+const compressAndUpload = async (tempFilePath, cloudPath, options = {}) => {
+  const { 
+    isVideo = false, 
+    imageQuality = 80, 
+    videoQuality = 'medium',
+    showProgress = true 
+  } = options;
+  
+  let compressedPath = tempFilePath;
+  let originalSize = await getFileSize(tempFilePath);
+  
+  if (showProgress) {
+    wx.showLoading({ title: '处理中...', mask: true });
+  }
+  
+  if (isVideo) {
+    compressedPath = await compressVideo(tempFilePath, videoQuality);
+  } else {
+    compressedPath = await compressImage(tempFilePath, imageQuality);
+  }
+  
+  let compressedSize = await getFileSize(compressedPath);
+  
+  logger.log('压缩前: ' + formatFileSize(originalSize) + ', 压缩后: ' + formatFileSize(compressedSize));
+  
+  if (showProgress) {
+    wx.showLoading({ title: '上传中...', mask: true });
+  }
+  
+  const uploadRes = await wx.cloud.uploadFile({
+    cloudPath: cloudPath,
+    filePath: compressedPath
+  });
+  
+  if (showProgress) {
+    wx.hideLoading();
+  }
+  
+  return {
+    fileID: uploadRes.fileID,
+    originalSize: originalSize,
+    compressedSize: compressedSize,
+    compressionRatio: originalSize > 0 ? ((originalSize - compressedSize) / originalSize * 100).toFixed(1) : 0
+  };
+};
+
+const chooseAndUploadImage = async (options = {}) => {
+  const { count = 1, quality = 80 } = options;
+
+  const chooseRes = await wx.chooseMedia({
+    count: count,
+    mediaType: ['image'],
+    sourceType: ['album', 'camera'],
+    sizeType: ['compressed']
   });
 
-  return res.fileID;
-}
+  wx.showLoading({ title: '上传中...', mask: true });
+  try {
+    const results = await Promise.all(
+      chooseRes.tempFiles.map(file => {
+        const cloudPath = 'images/' + Date.now() + '-' + Math.random().toString(36).substr(2) + '.jpg';
+        return compressAndUpload(file.tempFilePath, cloudPath, {
+          isVideo: false,
+          imageQuality: quality,
+          showProgress: false
+        });
+      })
+    );
+    return results;
+  } finally {
+    wx.hideLoading();
+  }
+};
+
+const chooseAndUploadVideo = async (options = {}) => {
+  const { maxDuration = 60, quality = 'medium' } = options;
+  
+  const chooseRes = await wx.chooseMedia({
+    count: 1,
+    mediaType: ['video'],
+    sourceType: ['album', 'camera'],
+    maxDuration: maxDuration
+  });
+  
+  const file = chooseRes.tempFiles[0];
+  const cloudPath = 'videos/' + Date.now() + '-' + Math.random().toString(36).substr(2) + '.mp4';
+  
+  const uploadResult = await compressAndUpload(file.tempFilePath, cloudPath, {
+    isVideo: true,
+    videoQuality: quality,
+    showProgress: true
+  });
+  
+  return uploadResult;
+};
 
 module.exports = {
-  MAX_IMAGE_SIZE,
-  MAX_VIDEO_SIZE,
-  compressImage,
-  compressVideo,
-  chooseAndCompressImage,
-  chooseAndCompressVideo,
-  uploadFile
+  compressImage: compressImage,
+  compressVideo: compressVideo,
+  getFileSize: getFileSize,
+  formatFileSize: formatFileSize,
+  compressAndUpload: compressAndUpload,
+  chooseAndUploadImage: chooseAndUploadImage,
+  chooseAndUploadVideo: chooseAndUploadVideo
 };

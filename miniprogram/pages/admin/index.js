@@ -1,41 +1,37 @@
-const app = getApp();
+const CacheManager = require('../../utils/cache.js');
+const { verifyAdmin, checkAdminCache } = require('../../utils/admin.js');
 
 Page({
-  data: {
-    menuList: [
-      {
-        id: 'service',
-        name: '服务管理',
-        icon: '⚙️',
-        url: '/pages/admin/service/index'
-      },
-      {
-        id: 'schedule',
-        name: '档期管理',
-        icon: '📅',
-        url: '/pages/admin/schedule/index'
-      },
-      {
-        id: 'booking',
-        name: '预约管理',
-        icon: '📋',
-        url: '/pages/admin/booking/index'
-      },
-      {
-        id: 'store',
-        name: '门店配置',
-        icon: '🏪',
-        url: '/pages/admin/store/index'
-      }
-    ]
+  onLoad: async function () {
+    if (!(await verifyAdmin())) return;
+  },
+  onShow: function () {
+    checkAdminCache();
   },
 
-  onLoad() {},
+  goToManage: function (e) {
+    const type = e.currentTarget.dataset.type;
+    wx.navigateTo({
+      url: `/pages/admin/manage/index?type=${type}`
+    });
+  },
 
-  onMenuTap(e) {
-    const { url } = e.currentTarget.dataset;
-    if (url) {
-      wx.navigateTo({ url });
-    }
+  goToTagManage: function (e) {
+    const type = e.currentTarget.dataset.type;
+    wx.navigateTo({
+      url: `/pages/admin/tags/index?type=${type}`
+    });
+  },
+
+  goToStoreManage: function () {
+    wx.navigateTo({
+      url: '/pages/admin/store/index'
+    });
+  },
+
+  goToUserManage: function () {
+    wx.navigateTo({
+      url: '/pages/admin/users/index'
+    });
   }
 });

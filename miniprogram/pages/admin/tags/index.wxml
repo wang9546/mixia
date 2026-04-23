@@ -1,0 +1,62 @@
+<view class="tags-container">
+  <!-- 顶部操作栏 -->
+  <view class="action-bar">
+    <button class="add-btn" bindtap="showAddModal">+ 新增标签</button>
+  </view>
+
+  <!-- 标签列表 -->
+  <view class="tags-list">
+    <view class="tag-item" wx:for="{{tags}}" wx:key="_id">
+      <view class="tag-info">
+        <text class="tag-name">{{item.name}}</text>
+        <text class="tag-count">{{item.childCount || 0}} 个子标签</text>
+      </view>
+      <view class="tag-actions">
+        <view class="status {{item.is_active ? 'active' : 'inactive'}}" bindtap="toggleStatus" data-id="{{item._id}}" data-active="{{item.is_active}}">
+          {{item.is_active ? '启用' : '禁用'}}
+        </view>
+        <view class="action-btns">
+          <text class="action-btn" bindtap="showEditModal" data-item="{{item}}">编辑</text>
+          <text class="action-btn delete" bindtap="deleteTag" data-id="{{item._id}}">删除</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{tags.length === 0}}">
+    <text class="empty-text">暂无标签</text>
+    <button class="add-btn" bindtap="showAddModal">添加第一个标签</button>
+  </view>
+</view>
+
+<!-- 添加/编辑弹窗 -->
+<view class="modal-mask" wx:if="{{showModal}}" catchtap="hideModal">
+  <view class="modal-content" catchtap="preventBubble">
+    <view class="modal-title">{{isEdit ? '编辑标签' : '新增标签'}}</view>
+    
+    <view class="modal-form">
+      <view class="form-item">
+        <text class="form-label">标签名称</text>
+        <input class="form-input" value="{{modalData.name}}" bindinput="onModalInput" data-field="name" placeholder="请输入标签名称" />
+      </view>
+      
+      <view class="form-item" wx:if="{{currentLevel === 2}}">
+        <text class="form-label">父级标签</text>
+        <picker mode="selector" range="{{parentTags}}" range-key="name" value="{{parentIndex}}" bindchange="onParentChange">
+          <view class="picker-value">{{parentTags[parentIndex].name || '请选择父级标签'}}</view>
+        </picker>
+      </view>
+      
+      <view class="form-item">
+        <text class="form-label">排序值</text>
+        <input class="form-input" type="number" value="{{modalData.sort_order}}" bindinput="onModalInput" data-field="sort_order" placeholder="数值越大越靠前" />
+      </view>
+    </view>
+    
+    <view class="modal-actions">
+      <button class="modal-btn cancel" bindtap="hideModal">取消</button>
+      <button class="modal-btn confirm" bindtap="saveTag" disabled="{{saving}}">{{saving ? '保存中...' : '保存'}}</button>
+    </view>
+  </view>
+</view>

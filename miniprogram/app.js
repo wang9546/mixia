@@ -1,32 +1,17 @@
-const db = require('./utils/db');
+// app.js
+const { ENV_ID } = require('./utils/config.js');
 
 App({
-  globalData: {
-    userInfo: null,
-    isAdmin: false
-  },
+  globalData: {},
 
-  async onLaunch() {
-    console.log('小程序启动');
-    
-    // 初始化云开发（在db.js中自动初始化）
-    // 获取用户信息
-    await this.getUserInfo();
-  },
-
-  async getUserInfo() {
-    if (this.globalData.userInfo) {
-      return this.globalData.userInfo;
-    }
-    
-    try {
-      const userInfo = await db.getUserInfo();
-      this.globalData.userInfo = userInfo;
-      this.globalData.isAdmin = userInfo.isAdmin || false;
-      return userInfo;
-    } catch (err) {
-      console.error('getUserInfo error:', err);
-      throw err;
+  onLaunch: function () {
+    if (!wx.cloud) {
+      console.error('请使用 2.2.3 或以上的基础库以使用云能力');
+    } else {
+      wx.cloud.init({
+        env: ENV_ID,
+        traceUser: true,
+      });
     }
   }
 });

@@ -1,0 +1,529 @@
+/* ── 详情页 · 极简雅白 ── */
+
+.detail-container {
+  padding:      0;
+  background:   var(--white);
+  min-height:   100vh;
+}
+
+/* ─── 加载 / 错误 ─── */
+.page-state-wrap {
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  justify-content: center;
+  padding:         160rpx 0;
+  gap:             24rpx;
+}
+
+.state-icon-wrap {
+  font-size: 48rpx;
+  color:     var(--gold-line);
+}
+
+.loading-spin {
+  animation: spin 2s linear infinite;
+}
+
+.state-text {
+  font-size:      25rpx;
+  color:          var(--dust);
+  letter-spacing: 3rpx;
+}
+
+/* ─── 主图 ─── */
+.main-image-wrap {
+  width:      100%;
+  height:     680rpx;
+  background: #E8E4DE;
+  position:   relative;
+  overflow:   hidden;
+}
+
+/* 底部渐白，过渡到卡片 */
+.main-image-wrap::after {
+  content:    '';
+  position:   absolute;
+  bottom:     0;
+  left:       0;
+  right:      0;
+  height:     160rpx;
+  background: linear-gradient(180deg, transparent 0%, var(--white) 100%);
+  z-index:    2;
+}
+
+.main-image {
+  width:  100%;
+  height: 100%;
+}
+
+.image-overlay {
+  position:   absolute;
+  inset:      0;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.08) 0%,
+    rgba(0, 0, 0, 0.28) 100%
+  );
+}
+
+/* 角标装饰：不显示 */
+.image-corner-decor { display: none; }
+
+/* ─── 信息卡片 ─── */
+.info-section {
+  margin:        0 var(--margin-page);
+  margin-top:    -80rpx;
+  padding:       40rpx 36rpx;
+  position:      relative;
+  z-index:       3;
+  background:    var(--white);
+  border-radius: var(--border-radius-card);
+  box-shadow:    var(--shadow-elevated);
+  border:        1rpx solid var(--rule);
+}
+
+/* 卡片顶部金线 */
+.info-section::before {
+  content:    '';
+  position:   absolute;
+  top: 0; left: 0; right: 0;
+  height:     1rpx;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity:    0.30;
+}
+
+.title-row {
+  display:         flex;
+  justify-content: space-between;
+  align-items:     flex-start;
+  margin-bottom:   24rpx;
+}
+
+.title-wrap {
+  flex:          1;
+  padding-right: 24rpx;
+}
+
+.title-right {
+  display:        flex;
+  flex-direction: column;
+  align-items:    flex-end;
+}
+
+.title {
+  font-size:      40rpx;
+  font-weight:    500;
+  color:          var(--ink);
+  line-height:    1.4;
+  letter-spacing: 2rpx;
+}
+
+/* 标题下方装饰线 */
+.title-decoration {
+  display:     flex;
+  align-items: center;
+  gap:         12rpx;
+  margin-top:  14rpx;
+}
+
+.decor-dot { display: none; }   /* 无圆点 */
+
+.decor-line {
+  width:      36rpx;
+  height:     1rpx;
+  background: linear-gradient(90deg, var(--gold), transparent);
+  opacity:    0.5;
+}
+
+/* 价格 */
+.price-wrap {
+  display:     flex;
+  align-items: baseline;
+  white-space: nowrap;
+}
+
+.price-label {
+  font-size:    20rpx;
+  color:        var(--gold);
+  font-weight:  400;
+  margin-right: 4rpx;
+}
+
+.price-value {
+  font-size:               42rpx;
+  font-weight:             500;
+  background:              linear-gradient(135deg, #C9A87C 0%, #B8956E 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip:         text;
+}
+
+.price-unit {
+  font-size:   19rpx;
+  color:       var(--dust);
+  margin-left: 6rpx;
+}
+
+/* ─── 标签 ─── */
+.tags-wrap {
+  display:      flex;
+  flex-wrap:    wrap;
+  padding-top:  20rpx;
+  border-top:   1rpx solid var(--rule);
+  gap:          10rpx;
+}
+
+.tag-item {
+  display:         inline-flex;
+  align-items:     center;
+  gap:             6rpx;
+  color:           var(--stone);
+  font-size:       21rpx;
+  padding:         7rpx 16rpx;
+  border-radius:   20rpx;
+  border:          1rpx solid var(--rule);
+  background:      var(--paper);
+}
+
+.tag-star {
+  font-size: 11rpx;
+  color:     var(--gold);
+}
+
+.tag-text {
+  letter-spacing: 1rpx;
+}
+
+/* ─── 规格网格 ─── */
+.specs-grid {
+  display:               grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap:                   10rpx;
+  padding-top:           20rpx;
+  border-top:            1rpx solid var(--rule);
+}
+
+.spec-item {
+  display:       flex;
+  align-items:   center;
+  padding:       16rpx 18rpx;
+  background:    var(--paper);
+  border-radius: var(--border-radius-sm);
+  border:        1rpx solid var(--rule);
+}
+
+.spec-icon {
+  font-size:    12rpx;
+  color:        var(--gold);
+  margin-right: 12rpx;
+  flex-shrink:  0;
+}
+
+.spec-content {
+  flex:           1;
+  display:        flex;
+  flex-direction: column;
+}
+
+.spec-label {
+  font-size:   19rpx;
+  color:       var(--dust);
+  margin-bottom: 3rpx;
+}
+
+.spec-value {
+  font-size:   23rpx;
+  color:       var(--ink);
+  font-weight: 500;
+}
+
+/* ─── 信息列表 ─── */
+.info-list {
+  padding-top: 20rpx;
+  border-top:  1rpx solid var(--rule);
+}
+
+.info-item {
+  display:     flex;
+  align-items: center;
+  padding:     14rpx 0;
+}
+
+.info-icon-wrap {
+  width:           32rpx;
+  height:          32rpx;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  background:      var(--paper);
+  border-radius:   50%;
+  border:          1rpx solid var(--rule);
+  margin-right:    16rpx;
+  flex-shrink:     0;
+}
+
+.info-icon {
+  font-size: 13rpx;
+  color:     var(--gold);
+}
+
+.info-content {
+  flex:           1;
+  display:        flex;
+  flex-direction: column;
+}
+
+.info-label {
+  font-size:   19rpx;
+  color:       var(--dust);
+  margin-bottom: 3rpx;
+}
+
+.info-value {
+  font-size:   23rpx;
+  color:       var(--ink);
+  font-weight: 500;
+}
+
+/* ─── 供应商信息 ─── */
+.vendor-info {
+  padding-top: 20rpx;
+  border-top:  1rpx solid var(--rule);
+}
+
+.vendor-badge {
+  display:         inline-flex;
+  align-items:     center;
+  gap:             7rpx;
+  color:           var(--gold);
+  font-size:       21rpx;
+  padding:         9rpx 20rpx;
+  border-radius:   20rpx;
+  border:          1rpx solid var(--gold-line);
+  margin-bottom:   18rpx;
+  background:      var(--paper);
+}
+
+.badge-icon {
+  font-size: 11rpx;
+}
+
+.vendor-price-row {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+}
+
+.vendor-price-label {
+  font-size: 23rpx;
+  color:     var(--stone);
+}
+
+.vendor-price-wrap {
+  display:     flex;
+  align-items: baseline;
+}
+
+.vendor-price-symbol {
+  font-size:    20rpx;
+  color:        var(--gold);
+  margin-right: 3rpx;
+}
+
+.vendor-price-value {
+  font-size:               30rpx;
+  font-weight:             500;
+  background:              linear-gradient(135deg, #C9A87C 0%, #B8956E 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip:         text;
+}
+
+/* ─── 简介区域 ─── */
+.intro-section {
+  margin:        var(--margin-card) var(--margin-page);
+  padding:       36rpx;
+  background:    var(--white);
+  border-radius: var(--border-radius-card);
+  box-shadow:    var(--shadow-card);
+  border:        1rpx solid var(--rule);
+  position:      relative;
+  overflow:      hidden;
+}
+
+.intro-section::before {
+  content:    '';
+  position:   absolute;
+  top: 0; left: 0; right: 0;
+  height:     1rpx;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity:    0.25;
+}
+
+.section-header {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             20rpx;
+  margin-bottom:   24rpx;
+}
+
+.section-decoration {
+  display:     flex;
+  align-items: center;
+  gap:         10rpx;
+}
+
+/* 标题装饰内的圆点：不显示 */
+.section-decoration .decor-dot { display: none; }
+
+.section-decoration .decor-line {
+  width:   32rpx;
+  height:  1rpx;
+  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.12));
+  opacity:    1;
+}
+
+.section-title {
+  font-size:      22rpx;
+  font-weight:    400;
+  color:          var(--stone);
+  letter-spacing: 8rpx;
+  text-indent:    8rpx;
+  text-transform: uppercase;
+}
+
+.intro-text {
+  font-size:      26rpx;
+  color:          var(--stone);
+  line-height:    1.9;
+  letter-spacing: 1rpx;
+}
+
+/* ─── 图片展示 ─── */
+.images-section {
+  padding:       0 var(--margin-page);
+  margin-bottom: 40rpx;
+}
+
+.section-header-wrap {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             20rpx;
+  margin-bottom:   28rpx;
+}
+
+.images-grid {
+  display:               grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap:                   10rpx;
+}
+
+.image-item {
+  width:         100%;
+  height:        380rpx;
+  border-radius: var(--border-radius-sm);
+  overflow:      hidden;
+  background:    #EEEBE6;
+  position:      relative;
+}
+
+.grid-image {
+  width:  100%;
+  height: 100%;
+}
+
+.image-overlay-light {
+  position:   absolute;
+  inset:      0;
+  background: linear-gradient(180deg, transparent 75%, rgba(0, 0, 0, 0.05) 100%);
+}
+
+/* ─── 底部 ─── */
+.bottom-placeholder {
+  height:     280rpx;
+  background: var(--white);
+}
+
+.bottom-bar {
+  position:  fixed;
+  bottom:    0;
+  left:      0;
+  right:     0;
+  height:    110rpx;
+  background: var(--white);
+  display:   flex;
+  align-items: center;
+  justify-content: space-between;
+  padding:   0 var(--margin-page);
+  border-top: 1rpx solid var(--rule);
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
+  z-index:   100;
+}
+
+.bottom-left  { flex: 1; }
+.bottom-right { flex: 1; display: flex; justify-content: flex-end; }
+
+.contact-btn {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             9rpx;
+  padding:         20rpx 36rpx;
+  background:      transparent;
+  border-radius:   var(--border-radius-lg);
+  border:          1rpx solid var(--rule);
+}
+
+.contact-icon {
+  font-size: 14rpx;
+  color:     var(--gold);
+}
+
+.contact-text {
+  font-size:      24rpx;
+  color:          var(--stone);
+  letter-spacing: 3rpx;
+}
+
+.action-btn {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             9rpx;
+  padding:         20rpx 40rpx;
+  background:      var(--ink);
+  border-radius:   var(--border-radius-lg);
+}
+
+.action-btn:active {
+  opacity: 0.85;
+}
+
+.action-btn.favorited {
+  background: var(--white);
+  border:     1rpx solid var(--rule);
+}
+
+.action-icon {
+  font-size:   26rpx;
+  color:       var(--white);
+  line-height: 1;
+}
+
+.action-btn.favorited .action-icon {
+  color: var(--gold);
+}
+
+.action-text {
+  font-size:      25rpx;
+  color:          var(--white);
+  letter-spacing: 3rpx;
+}
+
+.action-btn.favorited .action-text {
+  color: var(--stone);
+}

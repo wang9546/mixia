@@ -1,81 +1,133 @@
-<view class="page-container">
-  <view class="banner-wrap">
-    <swiper 
-      class="banner-swiper" 
-      indicator-dots="{{banners.length > 1}}" 
-      autoplay="{{true}}" 
-      interval="5000" 
-      circular="{{true}}"
-      indicator-color="rgba(255,255,255,0.3)"
-      indicator-active-color="#ffffff"
-    >
-      <swiper-item wx:for="{{banners}}" wx:key="_id" bindtap="onBannerTap" data-item="{{item}}">
-        <image class="banner-image" src="{{item.imageUrl || item.image}}" mode="aspectFill"></image>
-        <view class="banner-overlay"></view>
-      </swiper-item>
-      <swiper-item wx:if="{{banners.length === 0}}">
-        <view class="banner-placeholder">
-          <view class="placeholder-content">
-            <text class="placeholder-brand">MISCHA</text>
-            <text class="placeholder-slogan">WEDDING & EVENT</text>
-          </view>
-        </view>
-      </swiper-item>
-    </swiper>
+<view class="container home-container">
+  <view class="banner-section">
+    <image class="banner-image" src="/images/home/banner.png" mode="aspectFill"></image>
+    <view class="banner-overlay"></view>
+    <view class="banner-content">
+      <view class="banner-title-wrap">
+        <text class="banner-title"></text>
+        <view class="banner-decorative-line"></view>
+      </view>
+      <text class="banner-subtitle">MISCHA WEDDING</text>
+      <text class="banner-desc">让每一刻都成为永恒</text>
+    </view>
+    <view class="banner-corner-decor top-left"></view>
+    <view class="banner-corner-decor top-right"></view>
+    <view class="banner-corner-decor bottom-left"></view>
+    <view class="banner-corner-decor bottom-right"></view>
   </view>
 
-  <view class="services-section">
+  <view class="nav-section">
+    <view class="nav-card glass-effect">
+      <view class="nav-item animate-fade-in animate-delay-1" bindtap="navigateTo" data-url="/pages/list/index?type=dress">
+        <view class="nav-icon-wrap dress">
+          <view class="nav-icon-bg"></view>
+          <image class="nav-icon" src="/images/home/婚纱.svg" mode="aspectFit"></image>
+        </view>
+        <text class="nav-text">婚纱摄影</text>
+        <view class="nav-underline"></view>
+      </view>
+      <view class="nav-item animate-fade-in animate-delay-2" bindtap="navigateTo" data-url="/pages/list/index?type=decoration">
+        <view class="nav-icon-wrap decoration">
+          <view class="nav-icon-bg"></view>
+          <image class="nav-icon" src="/images/home/婚礼.svg" mode="aspectFit"></image>
+        </view>
+        <text class="nav-text">现场布置</text>
+        <view class="nav-underline"></view>
+      </view>
+      <view class="nav-item animate-fade-in animate-delay-3" bindtap="navigateTo" data-url="/pages/list/index?type=car">
+        <view class="nav-icon-wrap car">
+          <view class="nav-icon-bg"></view>
+          <image class="nav-icon" src="/images/home/婚车.svg" mode="aspectFit"></image>
+        </view>
+        <text class="nav-text">婚车租赁</text>
+        <view class="nav-underline"></view>
+      </view>
+      <view class="nav-item animate-fade-in animate-delay-4" bindtap="navigateTo" data-url="/pages/list/index?type=vendor">
+        <view class="nav-icon-wrap vendor">
+          <view class="nav-icon-bg"></view>
+          <image class="nav-icon" src="/images/home/婚礼-婚礼司仪.svg" mode="aspectFit"></image>
+        </view>
+        <text class="nav-text">四大金刚</text>
+        <view class="nav-underline"></view>
+      </view>
+    </view>
+  </view>
+
+  <view class="recommend-section">
     <view class="section-header">
-      <text class="sh-title">OUR SERVICES</text>
-      <text class="sh-subtitle">核心服务</text>
+      <view class="section-decoration">
+        <view class="decorative-dot left"></view>
+        <view class="decorative-line"></view>
+        <view class="decorative-dot right"></view>
+      </view>
+      <view class="section-title-wrap">
+        <text class="section-title">精选推荐</text>
+        <view class="section-underline"></view>
+      </view>
+      <text class="section-subtitle">CURATED MOMENTS</text>
+      <view class="section-decoration bottom">
+        <view class="decorative-dot left"></view>
+        <view class="decorative-line"></view>
+        <view class="decorative-dot right"></view>
+      </view>
     </view>
     
-    <view class="service-grid">
-      <view class="service-card" wx:for="{{serviceCategories}}" wx:key="id" bindtap="onCategoryTap" data-id="{{item.id}}">
-        <view class="sc-top">
-          <text class="sc-number">0{{index + 1}}</text>
-          <text class="sc-arrow">→</text>
+    <view class="recommend-list">
+      <block wx:for="{{recommendList}}" wx:key="_id">
+        <view class="card recommend-card hover-scale" bindtap="goToDetail" data-item="{{item}}">
+          <view class="card-image-wrap">
+            <image class="card-image" src="{{item.cover_thumb || item.cover_image || item.avatar || (item.images && item.images[0]) || '/images/home/banner.png'}}" mode="aspectFill"></image>
+            <view class="card-gradient"></view>
+            <view class="card-shimmer"></view>
+            <view class="card-tag" wx:if="{{item.moduleType === 'dress'}}">
+              <text class="tag-icon">✦</text>
+              <text class="tag-text">婚纱摄影</text>
+            </view>
+            <view class="card-tag" wx:if="{{item.moduleType === 'decoration'}}">
+              <text class="tag-icon">✦</text>
+              <text class="tag-text">现场布置</text>
+            </view>
+            <view class="card-tag" wx:if="{{item.moduleType === 'car'}}">
+              <text class="tag-icon">✦</text>
+              <text class="tag-text">婚车</text>
+            </view>
+            <view class="card-tag" wx:if="{{item.moduleType === 'vendor'}}">
+              <text class="tag-icon">✦</text>
+              <text class="tag-text">金刚</text>
+            </view>
+          </view>
+          <view class="card-content">
+            <view class="card-title text-ellipsis-2">{{item.name || item.title || item.model}}</view>
+            <view class="card-footer">
+              <view class="price-wrap" wx:if="{{item.price || item.daily_price}}">
+                <text class="price-symbol">¥</text>
+                <text class="price-value">{{(item.price || item.daily_price) / 100}}</text>
+              </view>
+              <text class="price-range" wx:elif="{{item.price_range}}">{{item.price_range}}</text>
+              <view class="btn-more">
+                <text class="btn-text">探索</text>
+                <text class="btn-arrow">→</text>
+              </view>
+            </view>
+          </view>
         </view>
-        <view class="sc-bottom">
-          <text class="sc-en">{{item.en}}</text>
-          <text class="sc-name">{{item.name}}</text>
-        </view>
+      </block>
+    </view>
+    
+    <view class="empty-state" wx:if="{{recommendList.length === 0 && !loading && !loadError}}">
+      <view class="empty-decoration">
+        <view class="empty-ring"></view>
+        <view class="empty-ring-inner"></view>
       </view>
+      <text class="empty-text">期待更多美好发生</text>
+      <view class="empty-decoration">
+        <view class="empty-ring"></view>
+        <view class="empty-ring-inner"></view>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:if="{{loadError}}">
+      <text class="empty-text">加载失败，请下拉刷新重试</text>
     </view>
   </view>
-
-  <view class="features-section">
-    <view class="feature-item">
-      <view class="fi-icon">I.</view>
-      <view class="fi-content">
-        <text class="fi-title">高定团队</text>
-        <text class="fi-desc">懂审美的策划师与设计师，把控每处花艺与光影的极致呈现</text>
-      </view>
-    </view>
-    <view class="feature-item">
-      <view class="fi-icon">II.</view>
-      <view class="fi-content">
-        <text class="fi-title">私人定制</text>
-        <text class="fi-desc">拒绝模板流水线，倾听你们的相遇故事，量身定制专属视觉</text>
-      </view>
-    </view>
-    <view class="feature-item">
-      <view class="fi-icon">III.</view>
-      <view class="fi-content">
-        <text class="fi-title">细节控</text>
-        <text class="fi-desc">从请柬纸张的触感到宾客桌卡的摆放，让您享受备婚的从容</text>
-      </view>
-    </view>
-  </view>
-
-  <view class="cta-section">
-    <view class="cta-box">
-      <text class="cta-en">START YOUR JOURNEY</text>
-      <text class="cta-title">开启浪漫之旅</text>
-      <view class="cta-line"></view>
-      <button class="cta-btn" bindtap="onBookingTap">预约专属顾问</button>
-    </view>
-  </view>
-
-  <float-service />
 </view>

@@ -1,0 +1,182 @@
+<view class="container detail-container">
+
+  <view class="page-state-wrap" wx:if="{{loading}}">
+    <view class="state-icon-wrap loading-spin">✦</view>
+    <text class="state-text">加载中...</text>
+  </view>
+
+  <view class="page-state-wrap" wx:elif="{{loadError}}">
+    <view class="state-icon-wrap">✦</view>
+    <text class="state-text">加载失败，请返回重试</text>
+  </view>
+
+  <block wx:else>
+  <view class="main-image-wrap">
+    <image class="main-image" src="{{detail[config.coverField] || (detail[config.imageField] && detail[config.imageField][0]) || '/images/home/banner.png'}}" mode="aspectFill" bindtap="previewCover" data-url="{{detail[config.coverField] || (detail[config.imageField] && detail[config.imageField][0])}}"></image>
+    <view class="image-overlay"></view>
+    <view class="image-corner-decor top-left"></view>
+    <view class="image-corner-decor top-right"></view>
+    <view class="image-corner-decor bottom-left"></view>
+    <view class="image-corner-decor bottom-right"></view>
+  </view>
+
+  <view class="info-section card">
+    <view class="title-row">
+      <view class="title-wrap">
+        <text class="title">{{detail[config.titleField] || '加载中...'}}</text>
+        <view class="title-decoration">
+          <view class="decor-dot"></view>
+          <view class="decor-line"></view>
+        </view>
+      </view>
+      <view class="title-right">
+        <view class="price-wrap" wx:if="{{config.priceField && config.infoType !== 'vendor'}}">
+          <block wx:if="{{detail[config.priceField]}}">
+            <text class="price-label">¥</text>
+            <text class="price-value">{{detail[config.priceField] / 100}}</text>
+            <text class="price-unit" wx:if="{{config.priceUnit}}">{{config.priceUnit}}</text>
+          </block>
+          <text class="price-value" wx:else>面议</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="tags-wrap" wx:if="{{config.infoType === 'tags' && (detail.level1_tags || detail.level2_tags)}}">
+      <view class="tag-item" wx:for="{{detail.level1_tags}}" wx:key="*this">
+        <text class="tag-star">✦</text>
+        <text class="tag-text">{{item}}</text>
+      </view>
+      <view class="tag-item" wx:for="{{detail.level2_tags}}" wx:key="*this">
+        <text class="tag-star">✦</text>
+        <text class="tag-text">{{item}}</text>
+      </view>
+    </view>
+
+    <view class="specs-grid" wx:if="{{config.infoType === 'specs'}}">
+      <view class="spec-item" wx:if="{{detail.seats}}">
+        <view class="spec-icon">✦</view>
+        <view class="spec-content">
+          <text class="spec-label">座位数</text>
+          <text class="spec-value">{{detail.seats}}座</text>
+        </view>
+      </view>
+      <view class="spec-item" wx:if="{{detail.color_name}}">
+        <view class="spec-icon">✦</view>
+        <view class="spec-content">
+          <text class="spec-label">颜色</text>
+          <text class="spec-value">{{detail.color_name}}</text>
+        </view>
+      </view>
+      <view class="spec-item" wx:if="{{detail.displacement}}">
+        <view class="spec-icon">✦</view>
+        <view class="spec-content">
+          <text class="spec-label">排量</text>
+          <text class="spec-value">{{detail.displacement}}</text>
+        </view>
+      </view>
+      <view class="spec-item" wx:if="{{detail.brand_name}}">
+        <view class="spec-icon">✦</view>
+        <view class="spec-content">
+          <text class="spec-label">品牌</text>
+          <text class="spec-value">{{detail.brand_name}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="info-list" wx:if="{{config.infoType === 'info'}}">
+      <view class="info-item" wx:if="{{detail.style}}">
+        <view class="info-icon-wrap">
+          <text class="info-icon">✦</text>
+        </view>
+        <view class="info-content">
+          <text class="info-label">风格</text>
+          <text class="info-value">{{detail.style}}</text>
+        </view>
+      </view>
+      <view class="info-item" wx:if="{{detail.venue}}">
+        <view class="info-icon-wrap">
+          <text class="info-icon">✦</text>
+        </view>
+        <view class="info-content">
+          <text class="info-label">适用场地</text>
+          <text class="info-value">{{detail.venue}}</text>
+        </view>
+      </view>
+      <view class="info-item" wx:if="{{detail.vendor_name}}">
+        <view class="info-icon-wrap">
+          <text class="info-icon">✦</text>
+        </view>
+        <view class="info-content">
+          <text class="info-label">服务商</text>
+          <text class="info-value">{{detail.vendor_name}}</text>
+        </view>
+      </view>
+    </view>
+    <view class="tags-wrap" wx:if="{{config.infoType === 'info' && (detail.level1_tags || detail.level2_tags)}}">
+      <view class="tag-item" wx:for="{{detail.level1_tags}}" wx:key="*this">
+        <text class="tag-star">✦</text>
+        <text class="tag-text">{{item}}</text>
+      </view>
+      <view class="tag-item" wx:for="{{detail.level2_tags}}" wx:key="*this">
+        <text class="tag-star">✦</text>
+        <text class="tag-text">{{item}}</text>
+      </view>
+    </view>
+
+    <view class="vendor-info" wx:if="{{config.infoType === 'vendor'}}">
+      <view class="vendor-badge" wx:if="{{detail.years_exp}}">
+        <text class="badge-icon">✦</text>
+        <text class="badge-text">从业{{detail.years_exp}}年</text>
+      </view>
+      <view class="vendor-price-row" wx:if="{{detail.price_range}}">
+        <text class="vendor-price-label">服务报价</text>
+        <view class="vendor-price-wrap">
+          <text class="vendor-price-symbol">¥</text>
+          <text class="vendor-price-value">{{detail.price_range}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="intro-section card" wx:if="{{detail[config.descField]}}">
+    <view class="section-header">
+      <view class="section-decoration">
+        <view class="decor-dot"></view>
+        <view class="decor-line"></view>
+        <view class="decor-dot"></view>
+      </view>
+      <text class="section-title">简介</text>
+      <view class="section-decoration">
+        <view class="decor-dot"></view>
+        <view class="decor-line"></view>
+        <view class="decor-dot"></view>
+      </view>
+    </view>
+    <text class="intro-text">{{detail[config.descField]}}</text>
+  </view>
+
+  <view class="images-section" wx:if="{{config.infoType !== 'vendor' && detail[config.imageField] && detail[config.imageField].length > 0}}">
+    <view class="section-header-wrap">
+      <view class="section-decoration">
+        <view class="decor-dot"></view>
+        <view class="decor-line"></view>
+        <view class="decor-dot"></view>
+      </view>
+      <text class="section-title">图片展示</text>
+      <view class="section-decoration">
+        <view class="decor-dot"></view>
+        <view class="decor-line"></view>
+        <view class="decor-dot"></view>
+      </view>
+    </view>
+    <view class="images-grid">
+      <block wx:for="{{detail[config.imageField]}}" wx:key="*this">
+        <view class="image-item" bindtap="previewImage" data-url="{{item}}">
+          <image class="grid-image" src="{{item}}" mode="aspectFill"></image>
+          <view class="image-overlay-light"></view>
+        </view>
+      </block>
+    </view>
+  </view>
+</block>
+</view>

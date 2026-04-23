@@ -1,7 +1,0 @@
-{
-  "navigationBarTitleText": "婚纱摄影",
-  "enablePullDownRefresh": true,
-  "usingComponents": {
-    "float-service": "/components/float-service/index"
-  }
-}

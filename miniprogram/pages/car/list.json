@@ -1,7 +1,0 @@
-{
-  "navigationBarTitleText": "婚车服务",
-  "enablePullDownRefresh": true,
-  "usingComponents": {
-    "float-service": "/components/float-service/index"
-  }
-}

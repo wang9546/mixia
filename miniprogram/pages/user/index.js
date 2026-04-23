@@ -1,113 +1,224 @@
-const app = getApp();
-const db = require('../../utils/db');
+// pages/user/index.js
+const CacheManager = require('../../utils/cache.js');
+const API = require('../../utils/api.js');
+const logger = require('../../utils/logger.js');
 
 Page({
   data: {
-    userInfo: null,
-    loading: true,
-    error: false,
-    menuList: [
-      { id: 'booking', icon: '/images/icons/booking.svg', title: '我的预约', url: '/pages/booking/my' },
-      { id: 'favorite', icon: '/images/icons/favorite.svg', title: '我的收藏', url: '/pages/user/favorite' },
-      { id: 'contact', icon: '/images/icons/customer-service.svg', title: '联系客服', url: '/pages/user/contact' },
-      { id: 'about', icon: '/images/icons/about.svg', title: '关于我们', url: '/pages/user/about' }
-    ],
-    isAdmin: false
+    userInfo: {
+      avatarUrl: '',
+      nickName: ''
+    },
+    hasUserInfo: false,
+    isAdmin: false,
+    tempNickname: ''
   },
 
-  onLoad() {
-    this.loadUserInfo();
-  },
-
-  onShow() {
-    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
-      this.getTabBar().setData({ selected: 3 });
-    }
-  },
-
-  async loadUserInfo() {
-    this.setData({ loading: true, error: false });
-    
+  onLoad: function () {
     try {
-      const userInfo = await db.getUserInfo();
-      this.setData({
-        userInfo,
-        isAdmin: userInfo.isAdmin || false,
-        loading: false
-      });
+      this.checkLoginStatus();
     } catch (err) {
-      console.error('获取用户信息失败:', err);
-      this.setData({ loading: false, error: true });
-      wx.showToast({ title: '获取用户信息失败', icon: 'none' });
+      console.error('用户页面初始化错误:', err);
     }
   },
 
-  onRetry() {
-    this.loadUserInfo();
+  onShow: function () {
   },
 
-  onMenuTap(e) {
-    const { url } = e.currentTarget.dataset;
-    wx.navigateTo({ url });
+  checkLoginStatus: function () {
+    try {
+      const cachedUser = CacheManager.get('userInfo');
+      logger.log('缓存用户信息:', cachedUser);
+      if (cachedUser && cachedUser.hasLogin) {
+        this.setData({
+          userInfo: cachedUser,
+          tempNickname: cachedUser.nickName || '',
+          hasUserInfo: true,
+          isAdmin: cachedUser.isAdmin || false
+        });
+        logger.log('用户已登录:', this.data.userInfo);
+      } else {
+        logger.log('用户未登录');
+      }
+    } catch (err) {
+      console.error('检查登录状态错误:', err);
+    }
   },
 
-  onAdminTap() {
-    wx.navigateTo({ url: '/pages/admin/index' });
+  onLoginTap: function () {
+    this.doLogin(false);
   },
 
-  async onChooseAvatar(e) {
-    const { avatarUrl } = e.detail;
-    console.log('选择头像:', avatarUrl);
+  onNicknameInput: function (e) {
+    const newNickname = e.detail.value;
+    this.setData({
+      tempNickname: newNickname
+    });
     
-    if (!avatarUrl) {
-      wx.showToast({ title: '未选择头像', icon: 'none' });
+    // 如果是微信昵称输入框自动填充的值，立即更新
+    if (newNickname && newNickname !== this.data.userInfo.nickName) {
+      this.setData({
+        'userInfo.nickName': newNickname
+      });
+    }
+  },
+
+  onNicknameBlur: function (e) {
+    const newNickname = e.detail.value.trim();
+    logger.log('昵称失焦，新昵称:', newNickname, '当前昵称:', this.data.userInfo.nickName);
+    
+    if (!newNickname) {
       return;
     }
     
-    wx.showLoading({ title: '上传中...' });
-    
-    try {
-      const cloudPath = `avatars/${Date.now()}_${Math.random().toString(36).substring(2, 8)}.jpg`;
-      const uploadRes = await wx.cloud.uploadFile({
-        cloudPath,
-        filePath: avatarUrl
+    if (newNickname !== this.data.userInfo.nickName) {
+      logger.log('昵称已修改，准备更新到数据库');
+      this.setData({
+        'userInfo.nickName': newNickname,
+        tempNickname: newNickname
       });
       
-      console.log('上传结果:', uploadRes);
-      
-      await this.updateUserInfo({ avatarUrl: uploadRes.fileID });
-      
-      wx.hideLoading();
-      wx.showToast({ title: '头像已更新', icon: 'success' });
-    } catch (err) {
-      wx.hideLoading();
-      console.error('上传头像失败:', err);
-      wx.showToast({ title: '上传头像失败', icon: 'none' });
+      if (this.data.hasUserInfo) {
+        this.doLogin(true);
+      }
     }
   },
 
-  async onNicknameInput(e) {
-    const { value } = e.detail;
-    console.log('昵称输入:', value);
+  onChooseAvatar: async function (e) {
+    const { avatarUrl } = e.detail;
+    this.setData({
+      'userInfo.avatarUrl': avatarUrl
+    });
+    if (this.data.hasUserInfo) {
+      await this.doLogin(true);
+    }
+  },
+
+  doLogin: async function (isUpdate = false) {
+    let { avatarUrl, nickName } = this.data.userInfo;
+    logger.log('doLogin 开始 - isUpdate:', isUpdate, 'avatarUrl:', avatarUrl, 'nickName:', nickName);
     
-    if (value && value.trim()) {
-      await this.updateUserInfo({ nickName: value.trim() });
+    if (!avatarUrl || avatarUrl === '/images/tabbar/user.png') {
+      avatarUrl = '';
+    }
+    
+    // 如果不是更新操作，不主动使用默认昵称覆盖，保留数据库原有数据
+    if (isUpdate && !nickName) {
+      nickName = '微信用户';
+      logger.log('使用默认昵称: 微信用户');
+    }
+
+    if (!isUpdate) {
+      wx.showLoading({ title: '登录中...', mask: true });
+    }
+
+    try {
+      let avatarCloudUrl = avatarUrl;
+
+      // 只有在更新且有本地/临时图片时，才上传头像
+      if (isUpdate && avatarCloudUrl && (avatarCloudUrl.startsWith('http://tmp/') || avatarCloudUrl.startsWith('wxfile://'))) {
+        const cloudPath = `avatars/${Date.now()}-${Math.floor(Math.random() * 1000)}.jpg`;
+        const uploadRes = await wx.cloud.uploadFile({
+          cloudPath: cloudPath,
+          filePath: avatarCloudUrl,
+        });
+        avatarCloudUrl = uploadRes.fileID;
+      }
+
+      const payload = isUpdate ? {
+        userInfo: {
+          avatarUrl: avatarCloudUrl,
+          nickName: nickName
+        }
+      } : {};
+      
+      logger.log('发送给云函数的 payload:', payload);
+
+      const result = await API.callCloudFunction('login', payload);
+
+      logger.log('登录云函数返回结果:', result);
+
+      if (result) {
+        const userData = result;
+        logger.log('用户数据:', userData);
+        logger.log('数据库中的昵称:', userData.nickName);
+        
+        const finalUserInfo = {
+          avatarUrl: userData.avatarUrl || avatarCloudUrl || '/images/tabbar/user.png',
+          nickName: userData.nickName || nickName,
+          hasLogin: true,
+          isAdmin: userData.isAdmin
+        };
+
+        logger.log('最终用户信息:', finalUserInfo);
+
+        this.setData({
+          userInfo: finalUserInfo,
+          tempNickname: finalUserInfo.nickName,
+          hasUserInfo: true,
+          isAdmin: userData.isAdmin
+        });
+
+        CacheManager.set('userInfo', finalUserInfo, 24 * 60 * 60 * 1000);
+
+        if (!isUpdate) {
+          wx.showToast({
+            title: '登录成功',
+            icon: 'success'
+          });
+        }
+      } else {
+        throw new Error('登录失败');
+      }
+    } catch (err) {
+      console.error('登录异常', err);
+      if (!isUpdate) {
+        wx.showToast({
+          title: '登录失败，请重试',
+          icon: 'none'
+        });
+      }
+    } finally {
+      if (!isUpdate) {
+        wx.hideLoading();
+      }
     }
   },
 
-  async updateUserInfo(data) {
-    try {
-      await db.updateUser(data);
-      
-      if (data.nickName) {
-        this.setData({ 'userInfo.nickName': data.nickName });
+  goToContact: function () {
+    wx.switchTab({
+      url: '/pages/contact/index'
+    });
+  },
+
+  goToAdmin: function () {
+    wx.navigateTo({ url: '/pages/admin/index' });
+  },
+
+  clearCache: function () {
+    wx.showModal({
+      title: '清除缓存',
+      content: '确定要清除所有本地缓存数据吗？',
+      success: (res) => {
+        if (res.confirm) {
+          const userInfo = CacheManager.get('userInfo');
+          CacheManager.clear();
+          if (userInfo) {
+            CacheManager.set('userInfo', userInfo, 24 * 60 * 60 * 1000);
+          }
+          wx.showToast({
+            title: '缓存已清除',
+            icon: 'success'
+          });
+        }
       }
-      if (data.avatarUrl) {
-        this.setData({ 'userInfo.avatarUrl': data.avatarUrl });
-      }
-    } catch (err) {
-      console.error('更新用户信息失败:', err);
-      wx.showToast({ title: '更新失败', icon: 'none' });
-    }
+    });
+  },
+
+  onShareAppMessage: function () {
+    return {
+      title: '米夏婚礼 - 你的专属婚礼管家',
+      path: '/pages/index/index'
+    };
   }
 });

@@ -1,0 +1,97 @@
+<view class="manage-container">
+  <view class="action-bar">
+    <view class="search-box">
+      <view class="search-icon-wrap">
+        <text class="search-icon">✦</text>
+      </view>
+      <input class="search-input" placeholder="搜索名称..." value="{{keyword}}" bindinput="onSearchInput" />
+    </view>
+    <button class="add-btn" bindtap="goToAdd">
+      <text class="add-icon">+</text>
+      <text class="add-text">新增</text>
+    </button>
+  </view>
+
+  <wxs module="fn">
+    module.exports = {
+      isActive: function(tags, id) {
+        if (!tags) return false;
+        return tags.indexOf(id) !== -1;
+      }
+    }
+  </wxs>
+  <scroll-view class="tag-scroll" scroll-x="true" wx:if="{{tags.length > 0}}">
+    <view class="tag-list">
+      <view class="tag-item {{(!selectedTags || selectedTags.length === 0) ? 'active' : ''}}" bindtap="onTagSelect" data-id="">
+        <text class="tag-text">全部</text>
+        <view class="tag-indicator" wx:if="{{!selectedTags || selectedTags.length === 0}}"></view>
+      </view>
+      <view wx:for="{{tags}}" wx:key="_id" class="tag-item {{fn.isActive(selectedTags, item._id) ? 'active' : ''}}" bindtap="onTagSelect" data-id="{{item._id}}">
+        <text class="tag-text">{{item.name}}</text>
+        <view class="tag-indicator" wx:if="{{fn.isActive(selectedTags, item._id)}}"></view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="data-list" wx:if="{{list.length > 0}}">
+    <view class="data-item card" wx:for="{{list}}" wx:key="_id">
+      <view class="item-cover-wrap">
+        <image class="item-cover" src="{{item.cover_image || item.avatar || (item.images && item.images[0]) || '/images/tabbar/user.png'}}" mode="aspectFill"></image>
+        <view class="cover-overlay"></view>
+      </view>
+      <view class="item-info">
+        <text class="item-name">{{item.name || item.title || item.model}}</text>
+        <text class="item-desc">{{item.description || item.service_desc || ''}}</text>
+        <view class="item-tags" wx:if="{{item.level1_tags && item.level1_tags.length > 0}}">
+          <view class="item-tag" wx:for="{{item.level1_tags}}" wx:key="*this" wx:for-item="tag">
+            <text class="tag-star">✦</text>
+            <text class="tag-label">{{tag}}</text>
+          </view>
+        </view>
+      </view>
+      <view class="item-actions">
+        <view class="status {{item.is_active ? 'active' : 'inactive'}}" bindtap="toggleStatus" data-id="{{item._id}}" data-active="{{item.is_active}}">
+          <text class="status-icon">{{item.is_active ? '✓' : '○'}}</text>
+          <text class="status-text">{{item.is_active ? '已上架' : '已下架'}}</text>
+        </view>
+        <view class="action-btns">
+          <view class="action-btn edit" bindtap="goToEdit" data-id="{{item._id}}">
+            <text class="btn-icon">✎</text>
+            <text class="btn-label">编辑</text>
+          </view>
+          <view class="action-btn delete" bindtap="deleteItem" data-id="{{item._id}}">
+            <text class="btn-icon">✕</text>
+            <text class="btn-label">删除</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty-state" wx:else>
+    <view class="empty-icon-wrap">
+      <view class="empty-ring-outer"></view>
+      <view class="empty-ring-inner"></view>
+      <text class="empty-icon">✦</text>
+    </view>
+    <text class="empty-text">暂无数据</text>
+    <button class="add-btn large" bindtap="goToAdd">
+      <text class="add-icon">+</text>
+      <text class="add-text">添加第一条数据</text>
+    </button>
+  </view>
+
+  <view class="load-more" wx:if="{{hasMore}}">
+    <view class="load-decoration">
+      <view class="load-line"></view>
+      <view class="load-dot"></view>
+      <view class="load-line"></view>
+    </view>
+    <text class="load-text" bindtap="loadMore">加载更多</text>
+    <view class="load-decoration">
+      <view class="load-line"></view>
+      <view class="load-dot"></view>
+      <view class="load-line"></view>
+    </view>
+  </view>
+</view>

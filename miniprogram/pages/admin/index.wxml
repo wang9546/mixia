@@ -1,22 +1,199 @@
-<view class="page-container">
+<view class="admin-container">
   <view class="admin-header">
-    <text class="admin-title">管理后台</text>
-    <text class="admin-subtitle">ADMIN CONSOLE</text>
+    <view class="header-bg"></view>
+    <view class="header-decoration">
+      <view class="decor-line-left"></view>
+      <view class="decor-dot"></view>
+      <view class="decor-line-right"></view>
+    </view>
+    <text class="header-title">后台管理</text>
+    <text class="header-subtitle">米夏婚礼运营中心</text>
+    <text class="header-en">ADMIN CENTER</text>
+    <view class="header-decoration bottom">
+      <view class="decor-line-left"></view>
+      <view class="decor-dot"></view>
+      <view class="decor-line-right"></view>
+    </view>
   </view>
 
-  <view class="menu-section">
-    <view 
-      class="menu-item" 
-      wx:for="{{menuList}}" 
-      wx:key="id"
-      bindtap="onMenuTap"
-      data-url="{{item.url}}"
-    >
-      <view class="menu-icon">{{item.icon}}</view>
-      <view class="menu-content">
-        <text class="menu-name">{{item.name}}</text>
+  <view class="section">
+    <view class="section-header">
+      <view class="section-decoration">
+        <view class="decor-dot"></view>
+        <view class="decor-line"></view>
       </view>
-      <text class="menu-arrow">→</text>
+      <text class="section-title">内容管理</text>
+      <view class="section-decoration">
+        <view class="decor-line"></view>
+        <view class="decor-dot"></view>
+      </view>
     </view>
+    <view class="menu-list card">
+      <view class="menu-item" bindtap="goToManage" data-type="dress">
+        <view class="menu-icon-wrap dress">
+          <text class="menu-icon">✦</text>
+        </view>
+        <view class="menu-content">
+          <text class="menu-text">婚纱摄影管理</text>
+          <text class="menu-desc">管理婚纱摄影作品</text>
+        </view>
+        <view class="menu-arrow-wrap">
+          <text class="menu-arrow">→</text>
+        </view>
+      </view>
+      <view class="menu-divider"></view>
+      <view class="menu-item" bindtap="goToManage" data-type="decoration">
+        <view class="menu-icon-wrap decoration">
+          <text class="menu-icon">✦</text>
+        </view>
+        <view class="menu-content">
+          <text class="menu-text">现场布置管理</text>
+          <text class="menu-desc">管理现场布置案例</text>
+        </view>
+        <view class="menu-arrow-wrap">
+          <text class="menu-arrow">→</text>
+        </view>
+      </view>
+      <view class="menu-divider"></view>
+      <view class="menu-item" bindtap="goToManage" data-type="car">
+        <view class="menu-icon-wrap car">
+          <text class="menu-icon">✦</text>
+        </view>
+        <view class="menu-content">
+          <text class="menu-text">婚车管理</text>
+          <text class="menu-desc">管理婚车信息</text>
+        </view>
+        <view class="menu-arrow-wrap">
+          <text class="menu-arrow">→</text>
+        </view>
+      </view>
+      <view class="menu-divider"></view>
+      <view class="menu-item" bindtap="goToManage" data-type="vendor">
+        <view class="menu-icon-wrap vendor">
+          <text class="menu-icon">✦</text>
+        </view>
+        <view class="menu-content">
+          <text class="menu-text">四大金刚管理</text>
+          <text class="menu-desc">管理金刚信息</text>
+        </view>
+        <view class="menu-arrow-wrap">
+          <text class="menu-arrow">→</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-header">
+      <view class="section-decoration">
+        <view class="decor-dot"></view>
+        <view class="decor-line"></view>
+      </view>
+      <text class="section-title">分类配置</text>
+      <view class="section-decoration">
+        <view class="decor-line"></view>
+        <view class="decor-dot"></view>
+      </view>
+    </view>
+    <view class="menu-list card">
+      <view class="menu-item" bindtap="goToTagManage" data-type="dress">
+        <view class="menu-icon-wrap tag">
+          <text class="menu-icon">✦</text>
+        </view>
+        <view class="menu-content">
+          <text class="menu-text">婚纱摄影标签</text>
+          <text class="menu-desc">管理城市、风格等标签</text>
+        </view>
+        <view class="menu-arrow-wrap">
+          <text class="menu-arrow">→</text>
+        </view>
+      </view>
+      <view class="menu-divider"></view>
+      <view class="menu-item" bindtap="goToTagManage" data-type="decoration">
+        <view class="menu-icon-wrap tag">
+          <text class="menu-icon">✦</text>
+        </view>
+        <view class="menu-content">
+          <text class="menu-text">现场布置标签</text>
+          <text class="menu-desc">管理布置类型标签</text>
+        </view>
+        <view class="menu-arrow-wrap">
+          <text class="menu-arrow">→</text>
+        </view>
+      </view>
+      <view class="menu-divider"></view>
+      <view class="menu-item" bindtap="goToTagManage" data-type="car">
+        <view class="menu-icon-wrap tag">
+          <text class="menu-icon">✦</text>
+        </view>
+        <view class="menu-content">
+          <text class="menu-text">婚车标签</text>
+          <text class="menu-desc">管理品牌、颜色标签</text>
+        </view>
+        <view class="menu-arrow-wrap">
+          <text class="menu-arrow">→</text>
+        </view>
+      </view>
+      <view class="menu-divider"></view>
+      <view class="menu-item" bindtap="goToTagManage" data-type="vendor">
+        <view class="menu-icon-wrap tag">
+          <text class="menu-icon">✦</text>
+        </view>
+        <view class="menu-content">
+          <text class="menu-text">金刚标签</text>
+          <text class="menu-desc">管理类型标签</text>
+        </view>
+        <view class="menu-arrow-wrap">
+          <text class="menu-arrow">→</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-header">
+      <view class="section-decoration">
+        <view class="decor-dot"></view>
+        <view class="decor-line"></view>
+      </view>
+      <text class="section-title">其他管理</text>
+      <view class="section-decoration">
+        <view class="decor-line"></view>
+        <view class="decor-dot"></view>
+      </view>
+    </view>
+    <view class="menu-list card">
+      <view class="menu-item" bindtap="goToStoreManage">
+        <view class="menu-icon-wrap store">
+          <text class="menu-icon">✦</text>
+        </view>
+        <view class="menu-content">
+          <text class="menu-text">门店信息管理</text>
+          <text class="menu-desc">编辑门店联系方式</text>
+        </view>
+        <view class="menu-arrow-wrap">
+          <text class="menu-arrow">→</text>
+        </view>
+      </view>
+      <view class="menu-divider"></view>
+      <view class="menu-item" bindtap="goToUserManage">
+        <view class="menu-icon-wrap user">
+          <text class="menu-icon">✦</text>
+        </view>
+        <view class="menu-content">
+          <text class="menu-text">用户管理</text>
+          <text class="menu-desc">查看注册用户</text>
+        </view>
+        <view class="menu-arrow-wrap">
+          <text class="menu-arrow">→</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="footer-decoration">
+    <view class="footer-line"></view>
+    <view class="footer-dot"></view>
+    <view class="footer-line"></view>
   </view>
 </view>

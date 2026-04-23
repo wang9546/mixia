@@ -1,4 +1,4 @@
 {
-  "navigationBarTitleText": "门店信息配置",
-  "enablePullDownRefresh": false
+  "navigationBarTitleText": "门店管理",
+  "usingComponents": {}
 }

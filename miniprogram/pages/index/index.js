@@ -1,90 +1,59 @@
-const db = require('../../utils/db');
-const app = getApp();
-
-const FIXED_CATEGORIES = [
-  { id: 'wedding_car', name: '婚车服务', en: 'WEDDING CAR' },
-  { id: 'wedding_photo', name: '婚纱摄影', en: 'PHOTOGRAPHY' },
-  { id: 'venue_decor', name: '现场布置', en: 'DECORATION' },
-  { id: 'staff', name: '四大金刚', en: 'EXPERT TEAM' }
-];
+const API = require('../../utils/api.js');
 
 Page({
   data: {
-    banners: [],
-    serviceCategories: FIXED_CATEGORIES,
+    recommendList: [],
     loading: true,
-    refreshing: false
+    loadError: false
   },
 
-  onLoad() {
-    this.initData();
+  onLoad: function () {
+    this.loadHomeData();
   },
 
-  onShow() {
-    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
-      this.getTabBar().setData({ selected: 0 });
-    }
-  },
-
-  onPullDownRefresh() {
-    this.setData({ refreshing: true });
-    this.initData().then(() => {
+  onPullDownRefresh: function () {
+    this.loadHomeData(true).finally(() => {
       wx.stopPullDownRefresh();
-      this.setData({ refreshing: false });
     });
   },
 
-  async initData() {
-    this.setData({ loading: true });
-    
-    try {
-      await this.loadBanners();
-    } catch (err) {
-      console.error('加载数据失败:', err);
+  loadHomeData: async function (forceRefresh = false) {
+    if (forceRefresh) {
+      const CacheManager = require('../../utils/cache.js');
+      CacheManager.remove('home_data');
     }
     
-    this.setData({ loading: false });
-  },
-
-  async loadBanners() {
+    this.setData({ loading: true, loadError: false });
     try {
-      const banners = await db.getBannerList(1);
-      this.setData({ banners });
+      const data = await API.getHomeData();
+      if (data) {
+        const validRecommendList = (data.recommendList || []).filter(item => 
+          item && item._id
+        );
+        
+        this.setData({
+          recommendList: validRecommendList
+        });
+      }
     } catch (err) {
-      console.error('加载Banner失败:', err);
+      console.error('Failed to load home data', err);
+      this.setData({ loadError: true });
+    } finally {
+      this.setData({ loading: false });
     }
   },
 
-  onBannerTap(e) {
-    const { item } = e.currentTarget.dataset;
-    if (!item) return;
-    
-    if (item.linkType === 'page' && item.linkUrl) {
-      wx.navigateTo({ url: item.linkUrl });
-    } else if (item.linkType === 'web' && item.linkUrl) {
+  navigateTo: function (e) {
+    const url = e.currentTarget.dataset.url;
+    wx.navigateTo({ url });
+  },
+
+  goToDetail: function (e) {
+    const item = e.currentTarget.dataset.item;
+    if (item.moduleType) {
       wx.navigateTo({
-        url: `/pages/webview/index?url=${encodeURIComponent(item.linkUrl)}`
+        url: `/pages/detail/index?id=${item._id}&type=${item.moduleType}`
       });
     }
-  },
-
-  onCategoryTap(e) {
-    const { id } = e.currentTarget.dataset;
-    
-    const routeMap = {
-      'wedding_car': '/pages/car/list',
-      'wedding_photo': '/pages/dress/list',
-      'venue_decor': '/pages/decor/list',
-      'staff': '/pages/vip/list'
-    };
-    
-    const url = routeMap[id];
-    if (url) {
-      wx.navigateTo({ url });
-    }
-  },
-
-  onBookingTap() {
-    wx.navigateTo({ url: '/pages/user/contact' });
   }
 });

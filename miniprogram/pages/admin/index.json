@@ -1,5 +1,4 @@
 {
-  "navigationBarTitleText": "管理看板",
-  "enablePullDownRefresh": true,
+  "navigationBarTitleText": "后台管理",
   "usingComponents": {}
 }

@@ -1,0 +1,8 @@
+{
+  "name": "mixia-cloudfunctions",
+  "version": "1.0.0",
+  "description": "米夏婚礼小程序云函数",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

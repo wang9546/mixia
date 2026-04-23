@@ -1,7 +1,0 @@
-{
-  "navigationBarTitleText": "布置详情",
-  "enablePullDownRefresh": false,
-  "usingComponents": {
-    "float-service": "/components/float-service/index"
-  }
-}

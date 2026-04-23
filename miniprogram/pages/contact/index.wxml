@@ -1,0 +1,118 @@
+<view class="container contact-container">
+  <view class="store-swiper-wrap" wx:if="{{storeInfo.images && storeInfo.images.length > 0}}">
+    <swiper class="store-swiper" indicator-dots="{{true}}" autoplay="{{true}}" circular="{{true}}" indicator-color="rgba(201, 168, 124, 0.3)" indicator-active-color="rgba(201, 168, 124, 0.8)">
+      <block wx:for="{{storeInfo.images}}" wx:key="*this">
+        <swiper-item>
+          <image class="store-image" src="{{item}}" mode="aspectFill" bindtap="previewImage" data-url="{{item}}"></image>
+          <view class="swiper-overlay"></view>
+        </swiper-item>
+      </block>
+    </swiper>
+    <view class="swiper-corner-decor top-left"></view>
+    <view class="swiper-corner-decor top-right"></view>
+    <view class="swiper-corner-decor bottom-left"></view>
+    <view class="swiper-corner-decor bottom-right"></view>
+  </view>
+
+  <view class="info-section">
+    <view class="card basic-card">
+      <view class="store-header">
+        <view class="store-decoration">
+          <view class="decor-dot"></view>
+          <view class="decor-line"></view>
+          <view class="decor-dot"></view>
+        </view>
+        <text class="store-name">{{storeInfo.name || '米夏婚礼'}}</text>
+        <view class="store-decoration">
+          <view class="decor-dot"></view>
+          <view class="decor-line"></view>
+          <view class="decor-dot"></view>
+        </view>
+      </view>
+      <view class="store-subtitle">MIXIA WEDDING</view>
+      <view class="store-desc" wx:if="{{storeInfo.description}}">{{storeInfo.description}}</view>
+    </view>
+
+    <view class="card contact-card">
+      <view class="contact-item" bindtap="openLocation" wx:if="{{storeInfo.address}}">
+        <view class="icon-wrap location">
+          <text class="icon-symbol">✦</text>
+        </view>
+        <view class="item-content">
+          <view class="item-title">门店地址</view>
+          <view class="item-desc">{{storeInfo.address}}</view>
+        </view>
+        <view class="action-btn-wrap">
+          <text class="action-text">导航</text>
+          <text class="action-arrow">→</text>
+        </view>
+      </view>
+      
+      <view class="contact-divider" wx:if="{{storeInfo.address && storeInfo.phones && storeInfo.phones.length > 0}}"></view>
+      
+      <view class="contact-item" wx:for="{{storeInfo.phones}}" wx:key="index" bindtap="makePhoneCall" data-phone="{{item}}">
+        <view class="icon-wrap phone">
+          <text class="icon-symbol">✦</text>
+        </view>
+        <view class="item-content">
+          <view class="item-title">{{index === 0 ? '联系电话' : '备用电话'}}</view>
+          <view class="item-desc phone-text">{{item}}</view>
+        </view>
+        <view class="action-btn-wrap">
+          <text class="action-text">拨打</text>
+          <text class="action-arrow">→</text>
+        </view>
+      </view>
+
+      <view class="contact-divider" wx:if="{{storeInfo.phones && storeInfo.phones.length > 0 && storeInfo.wechat}}"></view>
+      
+      <view class="contact-item" wx:if="{{storeInfo.wechat}}" bindtap="copyWechat">
+        <view class="icon-wrap wechat">
+          <text class="icon-symbol">✦</text>
+        </view>
+        <view class="item-content">
+          <view class="item-title">微信号</view>
+          <view class="item-desc">{{storeInfo.wechat}}</view>
+        </view>
+        <view class="action-btn-wrap">
+          <text class="action-text">复制</text>
+          <text class="action-arrow">→</text>
+        </view>
+      </view>
+
+      <view class="contact-divider"></view>
+      
+      <view class="contact-item">
+        <view class="icon-wrap online">
+          <text class="icon-symbol">✦</text>
+        </view>
+        <view class="item-content">
+          <view class="item-title">在线客服</view>
+          <view class="item-desc">微信在线咨询</view>
+        </view>
+        <button class="action-btn-wrap contact-btn" open-type="contact">
+          <text class="action-text">咨询</text>
+          <text class="action-arrow">→</text>
+        </button>
+      </view>
+
+      <view class="contact-divider" wx:if="{{storeInfo.business_hours}}"></view>
+      
+      <view class="contact-item" wx:if="{{storeInfo.business_hours}}">
+        <view class="icon-wrap hours">
+          <text class="icon-symbol">✦</text>
+        </view>
+        <view class="item-content">
+          <view class="item-title">营业时间</view>
+          <view class="item-desc">{{storeInfo.business_hours}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="footer-decoration">
+    <view class="footer-line"></view>
+    <view class="footer-dot"></view>
+    <view class="footer-line"></view>
+  </view>
+</view>
