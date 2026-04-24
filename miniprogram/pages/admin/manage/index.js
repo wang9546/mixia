@@ -15,6 +15,12 @@ Page({
     loading: false
   },
 
+  onShow: function () {
+    if (this.data.type) {
+      this.loadData(true);
+    }
+  },
+
   onLoad: async function (options) {
     if (!(await verifyAdmin())) return;
     const type = options.type || 'dress';
@@ -146,8 +152,13 @@ Page({
         const filesToDelete = [];
         const cover = item.cover_image || item.avatar;
         if (cover && cover.startsWith('cloud://')) filesToDelete.push(cover);
+        const thumb = item.cover_thumb;
+        if (thumb && thumb.startsWith('cloud://')) filesToDelete.push(thumb);
         (item.images || []).forEach(img => {
           if (img && img.startsWith('cloud://')) filesToDelete.push(img);
+        });
+        (item.videos || []).forEach(vid => {
+          if (vid && vid.startsWith('cloud://')) filesToDelete.push(vid);
         });
         if (filesToDelete.length > 0) {
           wx.cloud.deleteFile({ fileList: filesToDelete })

@@ -50,7 +50,8 @@ exports.main = async (event, context) => {
           years_exp: true,
           service_desc: true,
           color_name: true,
-          seats: true
+          seats: true,
+          videos: true
         })
         .orderBy('sort_order', 'desc')
         .orderBy('create_time', 'desc')

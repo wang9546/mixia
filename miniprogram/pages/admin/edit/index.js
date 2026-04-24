@@ -8,9 +8,12 @@ Page({
     type: '',
     id: '',
     nameLabel: '名称',
+    hasVideo: false,
     originalCover: '',
     originalCoverThumb: '',
     originalImages: [],
+    originalVideos: [],
+    videoDisplayUrls: [],
     formData: {
       name: '',
       price: '',
@@ -19,6 +22,7 @@ Page({
       cover_image: '',
       cover_thumb: '',
       images: [],
+      videos: [],
       level1_tags: [],
       is_active: true,
       is_featured: false,
@@ -40,7 +44,12 @@ Page({
       vendor: '姓名'
     };
 
-    this.setData({ type, id, nameLabel: nameLabelMap[type] });
+    this.setData({
+      type,
+      id,
+      nameLabel: nameLabelMap[type],
+      hasVideo: type === 'dress' || type === 'decoration'
+    });
     wx.setNavigationBarTitle({ title: id ? '编辑内容' : '新增内容' });
 
     this.loadTags();
@@ -63,6 +72,7 @@ Page({
         originalCover: data.cover_image || data.avatar || '',
         originalCoverThumb: data.cover_thumb || '',
         originalImages: data.images || [],
+        originalVideos: data.videos || [],
         formData: {
           name: data.name || data.title || data.model || '',
           price: data.price || data.daily_price || '',
@@ -71,15 +81,38 @@ Page({
           cover_image: data.cover_image || data.avatar || '',
           cover_thumb: data.cover_thumb || '',
           images: data.images || [],
+          videos: data.videos || [],
           level1_tags: data.level1_tags || [],
           is_active: data.is_active !== false,
           is_featured: data.is_featured || false,
           sort_order: data.sort_order || 0
         }
       });
+      await this._resolveVideoDisplayUrls(data.videos || []);
     } catch (err) {
       console.error('加载数据失败', err);
       wx.showToast({ title: '加载失败', icon: 'none' });
+    }
+  },
+
+  _resolveVideoDisplayUrls: async function (videos) {
+    if (!videos || videos.length === 0) {
+      this.setData({ videoDisplayUrls: [] });
+      return;
+    }
+    const cloudVideos = videos.filter(v => v && v.startsWith('cloud://'));
+    if (cloudVideos.length === 0) {
+      this.setData({ videoDisplayUrls: [...videos] });
+      return;
+    }
+    try {
+      const tempRes = await wx.cloud.getTempFileURL({ fileList: cloudVideos });
+      const urlMap = {};
+      tempRes.fileList.forEach(f => { urlMap[f.fileID] = f.tempFileURL; });
+      this.setData({ videoDisplayUrls: videos.map(v => urlMap[v] || v) });
+    } catch (e) {
+      console.error('获取视频临时链接失败', e);
+      this.setData({ videoDisplayUrls: [...videos] });
     }
   },
 
@@ -112,6 +145,16 @@ Page({
 
       const tempFilePath = chooseRes.tempFiles[0].tempFilePath;
       wx.showLoading({ title: '上传中...', mask: true });
+
+      // 上传前先清理本次会话中已上传但尚未保存的旧封面，避免孤儿文件
+      const { cover_image, cover_thumb } = this.data.formData;
+      const { originalCover, originalCoverThumb } = this.data;
+      if (cover_image && cover_image !== originalCover) {
+        this.deleteCloudFile(cover_image);
+      }
+      if (cover_thumb && cover_thumb !== originalCoverThumb) {
+        this.deleteCloudFile(cover_thumb);
+      }
 
       // 并行压缩：原图 quality 80，缩略图 quality 30
       const [coverPath, thumbPath] = await Promise.all([
@@ -180,6 +223,40 @@ Page({
     this.setData({ 'formData.images': images });
   },
 
+  uploadVideo: async function () {
+    const currentCount = (this.data.formData.videos || []).length;
+    if (currentCount >= 3) {
+      wx.showToast({ title: '最多上传3个视频', icon: 'none' });
+      return;
+    }
+    try {
+      const result = await compressUtil.chooseAndUploadVideo({ maxDuration: 60 });
+      if (result && result.fileID) {
+        const newVideos = [...(this.data.formData.videos || []), result.fileID];
+        this.setData({ 'formData.videos': newVideos });
+        await this._resolveVideoDisplayUrls(newVideos);
+      }
+    } catch (err) {
+      console.error('上传视频失败', err);
+      if (err && err.errMsg && err.errMsg.indexOf('cancel') === -1) {
+        wx.showToast({ title: '上传失败', icon: 'none' });
+      }
+    }
+  },
+
+  deleteVideo: function (e) {
+    const index = e.currentTarget.dataset.index;
+    const videos = [...this.data.formData.videos];
+    const displayUrls = [...this.data.videoDisplayUrls];
+    const deletedVideo = videos[index];
+    if (deletedVideo && !(this.data.originalVideos || []).includes(deletedVideo)) {
+      this.deleteCloudFile(deletedVideo);
+    }
+    videos.splice(index, 1);
+    displayUrls.splice(index, 1);
+    this.setData({ 'formData.videos': videos, videoDisplayUrls: displayUrls });
+  },
+
   deleteCover: function () {
     const { cover_image, cover_thumb } = this.data.formData;
     const { originalCover, originalCoverThumb } = this.data;
@@ -216,6 +293,7 @@ Page({
         cover_image: formData.cover_image,
         cover_thumb: formData.cover_thumb || '',
         images: formData.images,
+        videos: this.data.hasVideo ? (formData.videos || []) : [],
         level1_tags: formData.level1_tags || [],
         is_active: formData.is_active,
         is_featured: formData.is_featured || false,
@@ -241,7 +319,7 @@ Page({
 
       // 清理被替换或删除的原始云存储文件
       if (id) {
-        const { originalCover, originalCoverThumb, originalImages } = this.data;
+        const { originalCover, originalCoverThumb, originalImages, originalVideos } = this.data;
         const filesToDelete = [];
         if (originalCover && originalCover !== saveData.cover_image && originalCover !== saveData.avatar) {
           filesToDelete.push(originalCover);
@@ -251,6 +329,9 @@ Page({
         }
         (originalImages || []).forEach(img => {
           if (!saveData.images.includes(img)) filesToDelete.push(img);
+        });
+        (originalVideos || []).forEach(vid => {
+          if (!saveData.videos.includes(vid)) filesToDelete.push(vid);
         });
         filesToDelete.forEach(fileID => this.deleteCloudFile(fileID));
       }

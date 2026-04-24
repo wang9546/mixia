@@ -55,6 +55,21 @@
       </view>
     </view>
 
+    <!-- 视频列表（婚纱摄影、现场布置） -->
+    <view class="form-section" wx:if="{{hasVideo}}">
+      <view class="section-title">视频（最多3个）</view>
+      <view class="video-upload">
+        <view class="video-item-wrap" wx:for="{{formData.videos}}" wx:key="*this">
+          <video class="video-preview" src="{{videoDisplayUrls[index]}}" controls show-fullscreen-btn play-btn-position="center" object-fit="contain" initial-time="0"></video>
+          <view class="delete-btn video-delete-btn" bindtap="deleteVideo" data-index="{{index}}">×</view>
+        </view>
+        <view class="upload-btn upload-video-btn" bindtap="uploadVideo" wx:if="{{formData.videos.length < 3}}">
+          <text class="video-upload-icon">▶</text>
+          <text class="upload-text">添加视频</text>
+        </view>
+      </view>
+    </view>
+
     <!-- 标签选择 -->
     <wxs module="tagFn">
       module.exports = {

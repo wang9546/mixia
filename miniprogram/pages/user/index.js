@@ -97,11 +97,14 @@ Page({
   doLogin: async function (isUpdate = false) {
     let { avatarUrl, nickName } = this.data.userInfo;
     logger.log('doLogin 开始 - isUpdate:', isUpdate, 'avatarUrl:', avatarUrl, 'nickName:', nickName);
-    
+
+    // 在缓存更新前保存旧头像 URL，用于上传成功后删除
+    const oldAvatarUrl = isUpdate ? (CacheManager.get('userInfo') || {}).avatarUrl : null;
+
     if (!avatarUrl || avatarUrl === '/images/tabbar/user.png') {
       avatarUrl = '';
     }
-    
+
     // 如果不是更新操作，不主动使用默认昵称覆盖，保留数据库原有数据
     if (isUpdate && !nickName) {
       nickName = '微信用户';
@@ -114,6 +117,7 @@ Page({
 
     try {
       let avatarCloudUrl = avatarUrl;
+      let newAvatarUploaded = false;
 
       // 只有在更新且有本地/临时图片时，才上传头像
       if (isUpdate && avatarCloudUrl && (avatarCloudUrl.startsWith('http://tmp/') || avatarCloudUrl.startsWith('wxfile://'))) {
@@ -123,6 +127,7 @@ Page({
           filePath: avatarCloudUrl,
         });
         avatarCloudUrl = uploadRes.fileID;
+        newAvatarUploaded = true;
       }
 
       const payload = isUpdate ? {
@@ -131,7 +136,7 @@ Page({
           nickName: nickName
         }
       } : {};
-      
+
       logger.log('发送给云函数的 payload:', payload);
 
       const result = await API.callCloudFunction('login', payload);
@@ -142,7 +147,7 @@ Page({
         const userData = result;
         logger.log('用户数据:', userData);
         logger.log('数据库中的昵称:', userData.nickName);
-        
+
         const finalUserInfo = {
           avatarUrl: userData.avatarUrl || avatarCloudUrl || '/images/tabbar/user.png',
           nickName: userData.nickName || nickName,
@@ -160,6 +165,12 @@ Page({
         });
 
         CacheManager.set('userInfo', finalUserInfo, 24 * 60 * 60 * 1000);
+
+        // DB 写入成功后，删除对象存储中的旧头像
+        if (newAvatarUploaded && oldAvatarUrl && oldAvatarUrl.startsWith('cloud://') && oldAvatarUrl !== avatarCloudUrl) {
+          wx.cloud.deleteFile({ fileList: [oldAvatarUrl] })
+            .catch(err => console.error('删除旧头像失败:', err));
+        }
 
         if (!isUpdate) {
           wx.showToast({

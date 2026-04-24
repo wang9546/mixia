@@ -155,6 +155,35 @@
     <text class="intro-text">{{detail[config.descField]}}</text>
   </view>
 
+  <view class="videos-section" wx:if="{{config.hasVideo && detail.videos && detail.videos.length > 0}}">
+    <view class="section-header-wrap">
+      <view class="section-decoration">
+        <view class="decor-dot"></view>
+        <view class="decor-line"></view>
+        <view class="decor-dot"></view>
+      </view>
+      <text class="section-title">视频展示</text>
+      <view class="section-decoration">
+        <view class="decor-dot"></view>
+        <view class="decor-line"></view>
+        <view class="decor-dot"></view>
+      </view>
+    </view>
+    <view class="videos-list">
+      <block wx:for="{{detail.videos}}" wx:key="*this">
+        <view class="video-wrap">
+          <video wx:if="{{videoLocalPaths[index]}}" class="detail-video" src="{{videoLocalPaths[index]}}" controls show-fullscreen-btn enable-progress-gesture object-fit="contain" autoplay binderror="onVideoError" data-index="{{index}}"></video>
+          <view wx:else class="video-loading">
+            <view wx:if="{{videoDownloadProgress[index] >= 0}}" class="video-loading-spin loading-spin">✦</view>
+            <text wx:if="{{videoDownloadProgress[index] > 0}}" class="video-loading-text">{{videoDownloadProgress[index]}}%</text>
+            <text wx:elif="{{videoDownloadProgress[index] === 0}}" class="video-loading-text">准备中...</text>
+            <text wx:else class="video-loading-text">加载失败，请返回重试</text>
+          </view>
+        </view>
+      </block>
+    </view>
+  </view>
+
   <view class="images-section" wx:if="{{config.infoType !== 'vendor' && detail[config.imageField] && detail[config.imageField].length > 0}}">
     <view class="section-header-wrap">
       <view class="section-decoration">

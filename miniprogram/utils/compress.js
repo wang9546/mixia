@@ -133,24 +133,26 @@ const chooseAndUploadImage = async (options = {}) => {
 };
 
 const chooseAndUploadVideo = async (options = {}) => {
-  const { maxDuration = 60, quality = 'medium' } = options;
-  
+  const { maxDuration = 60 } = options;
+
   const chooseRes = await wx.chooseMedia({
     count: 1,
     mediaType: ['video'],
     sourceType: ['album', 'camera'],
     maxDuration: maxDuration
   });
-  
+
   const file = chooseRes.tempFiles[0];
+  // 大于 50MB 用 low，否则 medium，自动平衡画质与文件大小
+  const quality = (file.size || 0) > 50 * 1024 * 1024 ? 'low' : 'medium';
   const cloudPath = 'videos/' + Date.now() + '-' + Math.random().toString(36).substr(2) + '.mp4';
-  
+
   const uploadResult = await compressAndUpload(file.tempFilePath, cloudPath, {
     isVideo: true,
     videoQuality: quality,
     showProgress: true
   });
-  
+
   return uploadResult;
 };
 

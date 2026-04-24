@@ -92,13 +92,16 @@
 }
 
 .list-card .image-wrap {
-  position: relative;
-  width:    100%;
-  overflow: hidden;
+  position:   relative;
+  width:      100%;
+  height:     280rpx;
+  overflow:   hidden;
+  background: #EEEBE6;
 }
 
 .list-card .cover-image {
   width:   100%;
+  height:  100%;
   display: block;
 }
 

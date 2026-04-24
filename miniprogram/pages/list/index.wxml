@@ -31,7 +31,7 @@
       <block wx:for="{{leftList}}" wx:key="_id">
         <view class="card list-card hover-scale" bindtap="goToDetail" data-id="{{item._id}}">
           <view class="image-wrap">
-            <image class="cover-image" src="{{item.cover_thumb || item[config.coverField] || '/images/home/banner.png'}}" mode="widthFix" lazy-load="{{true}}"></image>
+            <image class="cover-image" src="{{item.cover_thumb || item[config.coverField] || '/images/home/banner.png'}}" mode="aspectFill" lazy-load="{{true}}"></image>
             <view class="image-overlay"></view>
             <view class="video-badge" wx:if="{{config.hasVideo && item.videos && item.videos.length > 0}}">
               <text class="video-icon">▶</text>
@@ -56,7 +56,7 @@
       <block wx:for="{{rightList}}" wx:key="_id">
         <view class="card list-card hover-scale" bindtap="goToDetail" data-id="{{item._id}}">
           <view class="image-wrap">
-            <image class="cover-image" src="{{item.cover_thumb || item[config.coverField] || '/images/home/banner.png'}}" mode="widthFix" lazy-load="{{true}}"></image>
+            <image class="cover-image" src="{{item.cover_thumb || item[config.coverField] || '/images/home/banner.png'}}" mode="aspectFill" lazy-load="{{true}}"></image>
             <view class="image-overlay"></view>
             <view class="video-badge" wx:if="{{config.hasVideo && item.videos && item.videos.length > 0}}">
               <text class="video-icon">▶</text>
