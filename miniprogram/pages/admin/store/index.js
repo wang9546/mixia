@@ -63,7 +63,7 @@ Page({
       phones.splice(index, 1);
       this.setData({ 'formData.phones': phones });
     } else {
-      wx.showToast({ title: '至少保留一个电话', icon: 'none' });
+      wx.showToast({ title: '至少保留一个联系人', icon: 'none' });
     }
   },
 

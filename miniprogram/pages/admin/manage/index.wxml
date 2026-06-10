@@ -17,6 +17,13 @@
       isActive: function(tags, id) {
         if (!tags) return false;
         return tags.indexOf(id) !== -1;
+      },
+      getTagName: function(tagList, id) {
+        if (!tagList) return id;
+        for (var i = 0; i < tagList.length; i++) {
+          if (tagList[i]._id === id) return tagList[i].name;
+        }
+        return id;
       }
     }
   </wxs>
@@ -45,7 +52,7 @@
         <view class="item-tags" wx:if="{{item.level1_tags && item.level1_tags.length > 0}}">
           <view class="item-tag" wx:for="{{item.level1_tags}}" wx:key="*this" wx:for-item="tag">
             <text class="tag-star">✦</text>
-            <text class="tag-label">{{tag}}</text>
+            <text class="tag-label">{{fn.getTagName(tags, tag)}}</text>
           </view>
         </view>
       </view>

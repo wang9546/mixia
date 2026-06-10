@@ -153,6 +153,26 @@ Page({
     this.setData({ videoDownloadProgress: prog });
   },
 
+  onShareAppMessage: function () {
+    const { detail, config, id, type } = this.data;
+    const title = detail[config.titleField] || '米夏婚礼 - 你的专属婚礼管家';
+    const imageUrl = detail[config.coverField] || '';
+    return {
+      title,
+      path: `/pages/detail/index?id=${id}&type=${type}`,
+      imageUrl
+    };
+  },
+
+  onShareTimeline: function () {
+    const { detail, config, id, type } = this.data;
+    const title = detail[config.titleField] || '米夏婚礼 - 你的专属婚礼管家';
+    return {
+      title,
+      query: `id=${id}&type=${type}`
+    };
+  },
+
   previewCover: function (e) {
     const currentUrl = e.currentTarget.dataset.url;
     const { detail, config } = this.data;

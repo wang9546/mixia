@@ -226,10 +226,4 @@ Page({
     });
   },
 
-  onShareAppMessage: function () {
-    return {
-      title: '米夏婚礼 - 你的专属婚礼管家',
-      path: '/pages/index/index'
-    };
-  }
 });

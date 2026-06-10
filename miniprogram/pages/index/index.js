@@ -48,6 +48,20 @@ Page({
     wx.navigateTo({ url });
   },
 
+  onShareAppMessage: function () {
+    return {
+      title: '米夏婚礼 - 你的专属婚礼管家',
+      path: '/pages/index/index'
+    };
+  },
+
+  onShareTimeline: function () {
+    return {
+      title: '米夏婚礼 - 你的专属婚礼管家',
+      query: ''
+    };
+  },
+
   goToDetail: function (e) {
     const item = e.currentTarget.dataset.item;
     if (item.moduleType) {

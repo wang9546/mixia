@@ -48,7 +48,7 @@ Page({
       type,
       id,
       nameLabel: nameLabelMap[type],
-      hasVideo: type === 'dress' || type === 'decoration'
+      hasVideo: type === 'dress' || type === 'decoration' || type === 'vendor'
     });
     wx.setNavigationBarTitle({ title: id ? '编辑内容' : '新增内容' });
 

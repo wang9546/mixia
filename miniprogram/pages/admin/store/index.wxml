@@ -10,19 +10,19 @@
       </view>
       
       <view class="form-item">
-        <text class="form-label">微信号</text>
-        <input class="form-input" name="wechat" value="{{formData.wechat}}" placeholder="请输入微信号" />
+        <text class="form-label">昵称</text>
+        <input class="form-input" name="wechat" value="{{formData.wechat}}" placeholder="请输入昵称" />
       </view>
-      
+
       <view class="form-item">
-        <text class="form-label">联系电话</text>
+        <text class="form-label">联系人</text>
         <view class="phone-list">
           <view class="phone-item" wx:for="{{formData.phones}}" wx:key="index">
-            <input class="form-input phone-input" value="{{item}}" bindinput="onPhoneInput" data-index="{{index}}" placeholder="请输入电话号码" />
+            <input class="form-input phone-input" value="{{item}}" bindinput="onPhoneInput" data-index="{{index}}" placeholder="请输入联系人" />
             <view class="phone-delete" bindtap="deletePhone" data-index="{{index}}">×</view>
           </view>
         </view>
-        <button class="add-phone-btn" bindtap="addPhone">+ 添加电话</button>
+        <button class="add-phone-btn" bindtap="addPhone">+ 添加联系人</button>
       </view>
       
       <view class="form-item">

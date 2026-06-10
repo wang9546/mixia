@@ -184,7 +184,7 @@
     </view>
   </view>
 
-  <view class="images-section" wx:if="{{config.infoType !== 'vendor' && detail[config.imageField] && detail[config.imageField].length > 0}}">
+  <view class="images-section" wx:if="{{detail[config.imageField] && detail[config.imageField].length > 0}}">
     <view class="section-header-wrap">
       <view class="section-decoration">
         <view class="decor-dot"></view>
